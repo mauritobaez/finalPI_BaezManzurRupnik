@@ -17,54 +17,71 @@ typedef struct best{
 }best;
 
 //información del año
-typedef struct year{
+typedef struct yearInfo{
     size_t amountSeries;
     size_t amountMovies;
     struct best bestMovie;
     struct best bestSeries;
     TList firstGenre;
-}year;
+}yearInfo;
 
 // nuestro CDT
 typedef struct imdbCDT{
-    year ** yearsAfter;
+    yearInfo ** yearsAfter;
     size_t sizeAfter;
-    year ** yearsBefore;
+    yearInfo ** yearsBefore;
     size_t sizeBefore;
     size_t yearZero;
     //se itera un año a la vez
     TList currentGenre;
 }imdbCDT;
-static void query1(year * year, char * titleType);
-static void query2(year* year, char * genre);
+
+static void query1(yearInfo* year, char * titleType);
+static void query2(yearInfo* year, char * genre);
+static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rating, size_t votes);
+
 imdbADT newImdb(){
     return calloc(1, sizeof(imdbCDT));
 }
 int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
     if(db->yearZero == 0){
-        db->yearZero=year;
+        db->yearZero = year;
     }
+    yearInfo*** yearsVec;
+    size_t yearIdx;
+    size_t* currentSize;
     if(year >= db->yearZero){
-        if( year-db->yearZero >= db->sizeAfter){
-            db->sizeAfter = year-db->yearZero+1;
-            db->yearsAfter = realloc(db->yearsAfter, sizeof(struct year)*(db->sizeAfter));
-        }
-        query1(db->yearsAfter[year-db->yearZero],titleType);
-        query2(db->yearsAfter[year-db->yearZero],genre);
-        query3(db->yearsAfter[year-db->yearZero],titleType,primaryTitle,rating,votes);
-        return 1;
-    }else{
-        if( db->yearZero-year >= db->sizeBefore){
-            db->sizeBefore = db->yearZero-year+1;
-            db->yearsBefore = realloc(db->yearsBefore, sizeof(struct year)*(db->sizeBefore));
-        }
-        query1(db->yearsBefore[db->yearZero-year],titleType);
-        query2(db->yearsBefore[db->yearZero-year],genre);
-        query3(db->yearsBefore[db->yearZero-year],titleType,primaryTitle,rating,votes);
-        return 1;
+        yearsVec = &db->yearsAfter;
+        yearIdx = year - db->yearZero;
+        currentSize = &db->sizeAfter;
     }
-    return 0;
+    else{
+        yearsVec = &db->yearsBefore;
+        yearIdx = db->yearZero - year;
+        currentSize = &db->sizeBefore;
+    }
+    if( yearIdx >= *currentSize ){
+        *yearsVec = realloc(*yearsVec, sizeof(yearInfo*) * (yearIdx + 1));
+        memset(*yearsVec + *currentSize, 0, sizeof(yearInfo*) * (yearIdx + 1 - *currentSize));
+        *currentSize = yearIdx + 1;
+    }
+    if((*yearsVec)[yearIdx] == NULL)
+    {
+        (*yearsVec)[yearIdx] = calloc(1, sizeof(yearInfo));
+    }
+    query1((*yearsVec)[yearIdx] ,titleType);
+    query2((*yearsVec)[yearIdx] ,genre);
+    query3((*yearsVec)[yearIdx] ,titleType,primaryTitle,rating,votes);
+    return 1;
 }
+
+static void query1(yearInfo* year, char * titleType){
+    if(!strcmp(titleType, "movie"))
+        year->amountMovies++;
+    else if (!strcmp(titleType, "tvSeries"))
+        year->amountSeries++;
+}
+
 static TList addGenre(TList first, char * genre){
     int c;
     if(first==NULL || (c=strcmp(first->genre, genre)) >0){
@@ -82,10 +99,13 @@ static TList addGenre(TList first, char * genre){
     return first;
 }
 
-static void query2(year* year, char * genre){
+static void query2(yearInfo* year, char * genre){
     year->firstGenre = addGenre(year->firstGenre, genre);
 }
 
+static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rating, size_t votes){
+
+}
 
 //iterador por genero
 void toBeginGenre(imdbADT imdb, size_t year){
@@ -113,9 +133,4 @@ char * next(imdbADT imdb){
 }
 
 
-static void query1(year * year, char * titleType){
-    if(!strcmp(titleType, "movie"))
-        year->amountMovies++;
-    else if (!strcmp(titleType, "tvSeries"))
-        year->amountSeries++;
-}
+
