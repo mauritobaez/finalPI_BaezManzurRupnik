@@ -17,8 +17,9 @@ int main(int argcount, char* args[])
         exit(2);
     }
     char **line;
+    imdbADT db=newImdb();
     while((line=readLine(input,DIM))!=NULL){
-        add(line[0],line[1],textToNum(line[2]),line[4],textToFloat(line[5]), textToNum(line[6]));
+        add(db,line[0],line[1],textToNum(line[2]),line[4],textToFloat(line[5]), textToNum(line[6]));
     }
     fclose(input);
     return 0;

@@ -8,6 +8,6 @@
 typedef struct imdbCDT * imdbADT;
 
 imdbADT newImdb();
-int add(char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes);
+int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes);
 
 #endif //TP_FINAL_PI_IMDBADT_H
