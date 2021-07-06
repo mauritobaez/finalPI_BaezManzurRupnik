@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 //lista para generos (query2)
 typedef struct node{
