@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "imdbADT.h"
 
-        //sacar, tiene que ir en el .h
-typedef struct imdbCDT * imdbADT;
 //lista para generos (query2)
 typedef struct node{
     char * genre;

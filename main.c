@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "imdbADT.h"
 
 int main(int argcount, char* args[])
 {
