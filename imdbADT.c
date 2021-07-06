@@ -70,15 +70,16 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
         (*yearsVec)[yearIdx] = calloc(1, sizeof(yearInfo));
     }
     query1((*yearsVec)[yearIdx] ,titleType);
-    query2((*yearsVec)[yearIdx] ,genre);
+    if(strcmp(titleType, "movie") == 0)
+        query2((*yearsVec)[yearIdx] ,genre);
     query3((*yearsVec)[yearIdx] ,titleType,primaryTitle,rating,votes);
     return 1;
 }
 
 static void query1(yearInfo* year, char * titleType){
-    if(!strcmp(titleType, "movie"))
+    if(strcmp(titleType, "movie") == 0)
         year->amountMovies++;
-    else if (!strcmp(titleType, "tvSeries"))
+    else if (strcmp(titleType, "tvSeries") == 0)
         year->amountSeries++;
 }
 
@@ -103,8 +104,26 @@ static void query2(yearInfo* year, char * genre){
     year->firstGenre = addGenre(year->firstGenre, genre);
 }
 
-static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rating, size_t votes){
-
+static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rollsRoyce, size_t votes){
+    best* bestInfo;
+    if(strcmp(titleType, "movie") == 0)
+    {
+        bestInfo = &year->bestMovie;
+    }
+    else if (strcmp(titleType, "tvSeries") == 0)
+    {
+        bestInfo = &year->bestSeries;
+    }
+    else
+    {
+        return;
+    }
+    if(bestInfo->name == NULL || votes > bestInfo->votes)
+    {
+        bestInfo->name = copyString(primaryTitle);
+        bestInfo->votes = votes;
+        bestInfo->rating = rollsRoyce;
+    }
 }
 
 //iterador por genero
