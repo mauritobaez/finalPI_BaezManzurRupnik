@@ -39,7 +39,28 @@ typedef struct imdbCDT{
 imdbADT newImdb(){
     return calloc(1, sizeof(imdbCDT));
 }
+int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
+    if(db->yearZero == 0){
+        db->yearZero=year;
+    }
+    if(year > db->yearZero){
+        if( year-db->yearZero > db->sizeAfter){
+            db->sizeAfter=year-db->yearZero;
+            db->yearsAfter=realloc(db->yearsAfter, sizeof(struct year)*(db->sizeAfter));
+        }
 
+    }else{
+        if( db->yearZero-year+1 > db->sizeBefore){
+            db->sizeBefore=(db->yearZero-year+1);
+            db->yearsBefore=realloc(db->yearsBefore, sizeof(struct year)*(db->sizeBefore));
+        }
+    }
+    if((strcmp(titleType,"movie"))==0){
+    }
+    else if((strcmp(titleType,"tvSeries"))==0){
+    }
+    return 0;
+}
 static TList addGenre(TList first, char * genre){
     int c;
     if(first==NULL || (c=strcmp(first->genre, genre)) >0){
