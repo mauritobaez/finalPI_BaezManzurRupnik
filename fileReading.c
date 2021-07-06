@@ -3,7 +3,9 @@
 char ** readLine(FILE* input,size_t dim){
     char line[MAX_LONG];
     size_t i=0;
-    fgets(line,MAX_LONG,input);
+    if(fgets(line,MAX_LONG,input)==NULL){
+        return NULL;
+    }
     char * token;
     char ** output;
     output=calloc(dim,sizeof(char *));
@@ -17,4 +19,7 @@ char ** readLine(FILE* input,size_t dim){
 }
 size_t textToNum(char * text){
     return (size_t) atoi(text);
+}
+float textToFloat(char *text){
+    return (float)atof(text);
 }

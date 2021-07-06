@@ -9,5 +9,5 @@
 
 char ** readLine(FILE* input,size_t dim);
 size_t textToNum(char * text);
-
+float textToFloat(char *text);
 #endif //TP_FINAL_PI_FILEREADING_H
