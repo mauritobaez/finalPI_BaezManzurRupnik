@@ -59,10 +59,10 @@ static TList addGenre(TList first, char * genre){
 
 static void query2(imdbADT imdb, size_t year, char * genre){
     if(year > imdb->yearZero){
-        addGenre(imdb->yearsAfter[year -imdb->yearZero -1]->firstGenre, genre);
+        imdb->yearsAfter[year -imdb->yearZero -1]->firstGenre=addGenre(imdb->yearsAfter[year -imdb->yearZero -1]->firstGenre, genre);
     }
     else{
-        addGenre(imdb->yearsBefore[imdb->yearZero- year]->firstGenre, genre);
+        imdb->yearsBefore[imdb->yearZero- year]->firstGenre=addGenre(imdb->yearsBefore[imdb->yearZero- year]->firstGenre, genre);
     }
 }
 
@@ -92,6 +92,9 @@ char * next(imdbADT imdb){
 }
 
 
-static void query1(){
-
+static void query1(year * year, char * titleType){
+    if(!strcmp(titleType, "movie"))
+        year->amountMovies++;
+    else if (!strcmp(titleType, "tvSeries"))
+        year->amountSeries++;
 }
