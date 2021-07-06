@@ -10,6 +10,12 @@ int main(int argcount, char* args[])
         exit(1);
     }
                     //El primer argumento está en args[1]
-
+    FILE * input;
+    input= fopen(args[1],"rt");
+    if(input==NULL){
+        fprintf(stderr, "Error in path to file,must exist");
+        exit(2);
+    }
+    fclose(input);
     return 0;
 }
