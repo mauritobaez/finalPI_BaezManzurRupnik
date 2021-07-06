@@ -1,4 +1,3 @@
-
 #include "fileReading.h"
 char ** readLine(FILE* input,size_t dim){
     char line[MAX_LONG];
