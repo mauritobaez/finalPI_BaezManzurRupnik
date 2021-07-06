@@ -35,7 +35,8 @@ typedef struct imdbCDT{
     //se itera un año a la vez
     TList currentGenre;
 }imdbCDT;
-
+static void query1(year * year, char * titleType);
+static void query2(year* year, char * genre);
 imdbADT newImdb(){
     return calloc(1, sizeof(imdbCDT));
 }
@@ -81,14 +82,10 @@ static TList addGenre(TList first, char * genre){
     return first;
 }
 
-static void query2(imdbADT imdb, size_t year, char * genre){
-    if(year > imdb->yearZero){
-        imdb->yearsAfter[year -imdb->yearZero -1]->firstGenre=addGenre(imdb->yearsAfter[year -imdb->yearZero -1]->firstGenre, genre);
-    }
-    else{
-        imdb->yearsBefore[imdb->yearZero- year]->firstGenre=addGenre(imdb->yearsBefore[imdb->yearZero- year]->firstGenre, genre);
-    }
+static void query2(year* year, char * genre){
+    year->firstGenre = addGenre(year->firstGenre, genre);
 }
+
 
 //iterador por genero
 void toBeginGenre(imdbADT imdb, size_t year){
