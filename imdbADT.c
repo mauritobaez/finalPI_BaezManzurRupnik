@@ -43,21 +43,24 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
     if(db->yearZero == 0){
         db->yearZero=year;
     }
-    if(year > db->yearZero){
-        if( year-db->yearZero > db->sizeAfter){
-            db->sizeAfter=year-db->yearZero;
-            db->yearsAfter=realloc(db->yearsAfter, sizeof(struct year)*(db->sizeAfter));
+    if(year >= db->yearZero){
+        if( year-db->yearZero >= db->sizeAfter){
+            db->sizeAfter = year-db->yearZero+1;
+            db->yearsAfter = realloc(db->yearsAfter, sizeof(struct year)*(db->sizeAfter));
         }
-
+        query1(db->yearsAfter[year-db->yearZero],titleType);
+        query2(db->yearsAfter[year-db->yearZero],genre);
+        query3(db->yearsAfter[year-db->yearZero],titleType,primaryTitle,rating,votes);
+        return 1;
     }else{
-        if( db->yearZero-year+1 > db->sizeBefore){
-            db->sizeBefore=(db->yearZero-year+1);
-            db->yearsBefore=realloc(db->yearsBefore, sizeof(struct year)*(db->sizeBefore));
+        if( db->yearZero-year >= db->sizeBefore){
+            db->sizeBefore = db->yearZero-year+1;
+            db->yearsBefore = realloc(db->yearsBefore, sizeof(struct year)*(db->sizeBefore));
         }
-    }
-    if((strcmp(titleType,"movie"))==0){
-    }
-    else if((strcmp(titleType,"tvSeries"))==0){
+        query1(db->yearsBefore[db->yearZero-year],titleType);
+        query2(db->yearsBefore[db->yearZero-year],genre);
+        query3(db->yearsBefore[db->yearZero-year],titleType,primaryTitle,rating,votes);
+        return 1;
     }
     return 0;
 }
