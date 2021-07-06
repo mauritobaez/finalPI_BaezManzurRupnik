@@ -1,6 +1,10 @@
 #ifndef TP_FINAL_PI_IMDBADT_H
 #define TP_FINAL_PI_IMDBADT_H
 #include <stdlib.h>
+#include "auxFunctions.h"
+#include <stdio.h>
+#include <string.h>
+
 typedef struct imdbCDT * imdbADT;
 
 imdbADT newImdb();

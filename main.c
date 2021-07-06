@@ -9,7 +9,6 @@ int main(int argcount, char* args[])
         fprintf(stderr, "Error in amount of arguments expected. (one)");
         exit(1);
     }
-                    //El primer argumento está en args[1]
     FILE * input;
     input= fopen(args[1],"rt");
     if(input==NULL){

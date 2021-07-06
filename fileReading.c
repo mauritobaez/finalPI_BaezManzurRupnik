@@ -1,4 +1,5 @@
 #include "fileReading.h"
+
 char ** readLine(FILE* input,size_t dim){
     char line[MAX_LONG];
     size_t i=0;
@@ -15,6 +16,5 @@ char ** readLine(FILE* input,size_t dim){
     return output;
 }
 size_t textToNum(char * text){
-    size_t num=atoi(text);
-    return num;
+    return (size_t) atoi(text);
 }

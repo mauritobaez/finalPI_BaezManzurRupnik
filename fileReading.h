@@ -5,8 +5,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "auxFunctions.h"
+
 char ** readLine(FILE* input,size_t dim);
 size_t textToNum(char * text);
-
 
 #endif //TP_FINAL_PI_FILEREADING_H

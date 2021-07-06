@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include "imdbADT.h"
 
-//sacar, tiene que ir en el .h
-typedef struct imdbCDT * imdbADT;
 //lista para generos (query2)
 typedef struct node{
     char * genre;
@@ -46,7 +42,7 @@ static TList addGenre(TList first, char * genre){
     int c;
     if(first==NULL || (c=strcmp(first->genre, genre)) >0){
         TList new = malloc(sizeof(TNode));
-        // new->genre = copyString(genre);
+        new->genre = copyString(genre);
         new->count=1;
         new->tail=first;
         return new;
