@@ -23,15 +23,17 @@ typedef struct year{
     struct best bestMovie;
     struct best bestSeries;
     TList firstGenre;
-    TList currentGenre;
 }year;
 
 // nuestro CDT
 typedef struct imdbCDT{
     year ** yearsAfter;
+    size_t sizeAfter;
     year ** yearsBefore;
-    size_t size;
+    size_t sizeBefore;
     size_t yearZero;
+    //se itera un año a la vez
+    TList currentGenre;
 }imdbCDT;
 
 imdbADT newImdb(){
@@ -60,6 +62,36 @@ static void query2(imdbADT imdb, size_t year, char * genre){
         addGenre(imdb->yearsAfter[year -imdb->yearZero -1]->firstGenre, genre);
     }
     else{
-        addGenre(imdb->yearsBefore[imdb->yearZero- year -1]->firstGenre, genre);
+        addGenre(imdb->yearsBefore[imdb->yearZero- year]->firstGenre, genre);
     }
+}
+
+//iterador por genero
+void toBeginGenre(imdbADT imdb, size_t year){
+    if(year>imdb->yearZero){
+        imdb->currentGenre = imdb->yearsAfter[year - imdb->yearZero-1]->firstGenre;
+    }
+    else
+        imdb->currentGenre = imdb->yearsBefore[-year+imdb->yearZero]->firstGenre;
+}
+
+int hasNext(imdbADT imdb){
+    return imdb->currentGenre !=NULL;
+}
+
+// devuelve una copia del current
+char * next(imdbADT imdb){
+    if(!hasNext(imdb)){
+        //algo malo pasa
+        // return NULL;
+        // ?
+    }
+    char * aux = copyString(imdb->currentGenre->genre);
+    imdb->currentGenre = imdb->currentGenre->tail;
+    return aux;
+}
+
+
+static void query1(){
+
 }
