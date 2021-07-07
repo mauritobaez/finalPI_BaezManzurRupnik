@@ -9,5 +9,8 @@ typedef struct imdbCDT * imdbADT;
 
 imdbADT newImdb();
 int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes);
+void toBeginGenre(imdbADT imdb, size_t year);
+int hasNext(imdbADT imdb);
+char * next(imdbADT imdb);
 
 #endif //TP_FINAL_PI_IMDBADT_H
