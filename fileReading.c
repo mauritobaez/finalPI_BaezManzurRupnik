@@ -1,22 +1,19 @@
 #include "fileReading.h"
 
-char ** readLine(FILE* input,size_t dim){
+int readLine(FILE* input,size_t dim,char output[DIM][MAX_LONG]){
     char line[MAX_LONG];
     size_t i = 0;
     if(fgets(line,MAX_LONG,input) == NULL){
-        return NULL;
+        return 0;
     }
     char * token;
-    char ** output;
-    output = calloc(dim,sizeof(char *));
-    CHECK_ALLOC(output);
     token = strtok(line,DELIM);
     while(token != NULL){
-        output[i] = copyString(token);
+        strcpy(output[i],token);
         i++;
         token = strtok(NULL,DELIM);
     }
-    return output;
+    return 1;
 }
 
 void writeLine(FILE* output, size_t dim, char** info)

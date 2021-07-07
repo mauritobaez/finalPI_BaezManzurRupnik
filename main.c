@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "imdbADT.h"
 #include "fileReading.h"
-#define DIM 8
+
 
 int main(int argcount, char* args[])
 {
@@ -17,25 +17,15 @@ int main(int argcount, char* args[])
         fprintf(stderr, "Error in path to file,must exist");
         exit(2);
     }
-    char **line=readLine(input,DIM); // leo la primera linea que es el encabezado
-    for(int i=0 ; i<DIM ; i++)
-    {
-        free(line[i]);
-    }
-    free(line);
-
+    char line[DIM][MAX_LONG];
+    readLine(input,DIM,line); // leo la primera linea que es el encabezado
     size_t year;
     imdbADT db = newImdb();
-    while((line=readLine(input,DIM))!=NULL){
+    while(readLine(input,DIM,line)!=0){
         year=textToNum(line[2]);
         if(year!=0) {
             add(db, line[0], line[1], year, line[4], textToFloat(line[5]), textToNum(line[6]));
         }
-        for(int i=0 ; i<DIM ; i++)
-        {
-            free(line[i]);
-        }
-        free(line);
     }
     fclose(input);
     FILE * query1 = fopen("query1.csv","wt");
