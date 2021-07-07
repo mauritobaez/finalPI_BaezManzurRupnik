@@ -16,7 +16,7 @@ int main(int argcount, char* args[])
         fprintf(stderr, "Error in path to file,must exist");
         exit(2);
     }
-    char **line;
+    char **line=readLine(input,DIM); // leo la primera linea que es el encabezado
     size_t year;
     imdbADT db=newImdb();
     while((line=readLine(input,DIM))!=NULL){
@@ -26,5 +26,9 @@ int main(int argcount, char* args[])
         }
     }
     fclose(input);
+    FILE * query1 = fopen("./query1.csv","wt");
+    FILE * query2 = fopen("./query2.csv","wt");
+    FILE * query3 = fopen("./query3.csv","wt");
+
     return 0;
 }
