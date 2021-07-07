@@ -12,5 +12,6 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
 void toBeginGenre(imdbADT imdb, size_t year);
 int hasNext(imdbADT imdb);
 char * next(imdbADT imdb);
+void freeImdb(imdbADT imdb);
 
 #endif //TP_FINAL_PI_IMDBADT_H

@@ -38,7 +38,31 @@ typedef struct imdbCDT{
 
 static void query1(yearInfo* year, char * titleType);
 static void query2(yearInfo* year, char * genre);
-static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rating, size_t votes);
+static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rollsRoyce, size_t votes);
+
+static void freeList(TList list){
+    if(list==NULL)
+        return;
+    freeList(list->tail);
+    free(list);
+}
+
+static void freeVector(yearInfo ** vector, size_t until){
+    for(int i=0; i<until; i++){
+        if(vector[i] != NULL){
+            freeList(vector[i]->firstGenre);
+            free(vector[i]);
+        }
+    }
+}
+
+void freeImdb(imdbADT imdb){
+    freeVector(imdb->yearsAfter, imdb->sizeAfter);
+    freeVector(imdb->yearsBefore, imdb->sizeBefore);
+    free(imdb->yearsAfter);
+    free(imdb->yearsBefore);
+    free(imdb);
+}
 
 imdbADT newImdb(){
     return calloc(1, sizeof(imdbCDT));
@@ -150,6 +174,3 @@ char * next(imdbADT imdb){
     imdb->currentGenre = imdb->currentGenre->tail;
     return aux;
 }
-
-
-
