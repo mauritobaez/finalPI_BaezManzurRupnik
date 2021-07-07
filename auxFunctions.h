@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#define CHECK_ALLOC(x) {    if(x==NULL)\
+#define CHECK_ALLOC(x) {    if((x)==NULL)\
                             {  fprintf(stderr, "Error. No more memory available.");\
                                 exit(3);\
                             }\
