@@ -179,3 +179,32 @@ char * next(imdbADT imdb, size_t* count){
     imdb->currentGenre = imdb->currentGenre->tail;
     return aux;
 }
+size_t getLastYear(imdbADT db){
+    return db->sizeAfter+db->yearZero-1;
+}
+size_t getFirstYear(imdbADT db){
+    return db->yearZero-db->sizeBefore+1;
+}
+size_t getAmount(imdbADT db, size_t year,char * titleType){
+    size_t yearIdx;
+    yearInfo** yearsVec;
+    if(year >= db->yearZero){
+        yearsVec = db->yearsAfter;
+        yearIdx = year - db->yearZero;
+    }
+    else{
+        yearsVec = db->yearsBefore;
+        yearIdx = db->yearZero - year;
+    }
+    if(strcmp(titleType, "movie") == 0)
+    {
+        return yearsVec[yearIdx]->amountMovies;
+    }
+    else if (strcmp(titleType, "tvSeries") == 0)
+    {
+        return yearsVec[yearIdx]->amountSeries;
+    }
+    return 0;
+}
+
+

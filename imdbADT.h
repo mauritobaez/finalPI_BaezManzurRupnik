@@ -14,8 +14,7 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
 size_t getLastYear(imdbADT db);
 size_t getFirstYear(imdbADT db);
 
-size_t getAmountSeries(imdbADT db, size_t year);
-size_t getAmountMovies(imdbADT db, size_t year);
+size_t getAmount(imdbADT db, size_t year, char* titleType);
 
 void toBeginGenre(imdbADT imdb, size_t year);
 int hasNext(imdbADT imdb);
