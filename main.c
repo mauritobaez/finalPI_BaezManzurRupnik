@@ -17,9 +17,13 @@ int main(int argcount, char* args[])
         exit(2);
     }
     char **line;
+    size_t year;
     imdbADT db=newImdb();
     while((line=readLine(input,DIM))!=NULL){
-        add(db,line[0],line[1],textToNum(line[2]),line[4],textToFloat(line[5]), textToNum(line[6]));
+        year=textToNum(line[2]);
+        if(year!=0) {
+            add(db, line[0], line[1], year, line[4], textToFloat(line[5]), textToNum(line[6]));
+        }
     }
     fclose(input);
     return 0;
