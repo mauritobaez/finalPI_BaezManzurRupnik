@@ -65,8 +65,11 @@ void freeImdb(imdbADT imdb){
 }
 
 imdbADT newImdb(){
-    return calloc(1, sizeof(imdbCDT));
+    imdbADT new = calloc(1, sizeof(imdbCDT));
+    CHECK_ALLOC(new);
+    return new;
 }
+
 int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
     if(db->yearZero == 0){
         db->yearZero = year;
@@ -86,12 +89,14 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
     }
     if( yearIdx >= *currentSize ){
         *yearsVec = realloc(*yearsVec, sizeof(yearInfo*) * (yearIdx + 1));
+        CHECK_ALLOC(*yearsVec);
         memset(*yearsVec + *currentSize, 0, sizeof(yearInfo*) * (yearIdx + 1 - *currentSize));
         *currentSize = yearIdx + 1;
     }
     if((*yearsVec)[yearIdx] == NULL)
     {
         (*yearsVec)[yearIdx] = calloc(1, sizeof(yearInfo));
+        CHECK_ALLOC((*yearsVec)[yearIdx]);
     }
     query1((*yearsVec)[yearIdx] ,titleType);
     if(strcmp(titleType, "movie") == 0)
@@ -111,6 +116,7 @@ static TList addGenre(TList first, char * genre){
     int c;
     if(first==NULL || (c=strcmp(first->genre, genre)) >0){
         TList new = malloc(sizeof(TNode));
+        CHECK_ALLOC(new);
         new->genre = copyString(genre);
         new->count=1;
         new->tail=first;
