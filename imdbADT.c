@@ -199,6 +199,8 @@ size_t getAmount(imdbADT db, char * titleType, size_t year){
         yearsVec = db->yearsBefore;
         yearIdx = db->yearZero - year;
     }
+    if(yearsVec[yearIdx]==NULL)
+        return 0;
     if(strcmp(titleType, "movie") == 0)
     {
         return yearsVec[yearIdx]->amountMovies;
