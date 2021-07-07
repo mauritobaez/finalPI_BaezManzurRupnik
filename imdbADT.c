@@ -174,14 +174,14 @@ int hasNext(imdbADT imdb){
 }
 
 // devuelve una copia del current
-char * next(imdbADT imdb, size_t* count){
+size_t next(imdbADT imdb, char * string){
     if(!hasNext(imdb)){
-        return NULL;
+        return 0;
     }
-    char * aux = copyString(imdb->currentGenre->genre);
-    *count = imdb->currentGenre->count;
+    strcpy(string, imdb->currentGenre->genre);
+    size_t count = imdb->currentGenre->count;
     imdb->currentGenre = imdb->currentGenre->tail;
-    return aux;
+    return count;
 }
 
 size_t getLastYear(imdbADT db){
@@ -237,7 +237,7 @@ char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* v
             return NULL;
         *rating = yearsVec[yearIdx]->bestMovie.rating;
         *votes = yearsVec[yearIdx]->bestMovie.votes;
-        aux = copyString(yearsVec[yearIdx]->bestMovie.name);
+        aux = copyString(yearsVec[yearIdx]->bestMovie.name); //hay que hacerle free, o cambiar la función directamente
     }
     else if (strcmp(titleType, "tvSeries") == 0)
     {

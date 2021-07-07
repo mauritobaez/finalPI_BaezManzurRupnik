@@ -19,7 +19,7 @@ int main(int argcount, char* args[])
         exit(2);
     }
 
-    char line[DIM][MAX_LONG];
+    char line[DIM][MAX_LONG] = {0};
     readLine(input, line); // leo la primera linea que es el encabezado
     int year;
     imdbADT db = newImdb();
@@ -52,6 +52,7 @@ int main(int argcount, char* args[])
         size_t series = getAmount(db, "tvSeries", y);
         if( movies!=0 || series!=0 ) //si hay algo ese año
         {
+            //query1
             char * vector[8] ={line[0], line[1], line[2], line[3], line[4],
                                line[5], line[6], line[7]};
             numToText(y, line[0]);
@@ -59,13 +60,25 @@ int main(int argcount, char* args[])
             numToText(series, line[2]);
             writeLine(query1, 3, vector);
 
+            //query2
+            toBeginGenre(db, y);
+            size_t count;
+            while(hasNext(db)){
+                count = next(db, line[1]);
+                numToText(count, line[2]);
+                writeLine(query2, 3, vector);
+            }
+
+            //query3
             //char* q3[7]; Esto es lo que estaba antes
-            numToText(y, line[0]);
+            //numToText(y, line[0]); Ya está puesto el año
             float ratingM;
             float ratingS;
             size_t votesM;
             size_t votesS;
-            strcpy(line[1], getBest(db, "movie", y, &ratingM, &votesM));
+            char * aux = getBest(db, "movie", y, &ratingM, &votesM);
+            strcpy(line[1], aux);//podemos cambiarlo con la mejora de jamboard
+            free(aux);
             if(line[1][0]=='\0')
             {
                 for(int i=1; i<4; i++){
@@ -77,7 +90,9 @@ int main(int argcount, char* args[])
                 numToText(votesM, line[2]);
                 floatToText(ratingM, line[3]);
             }
-            strcpy(line[4],getBest(db, "tvSeries", y, &ratingS, &votesS));
+            aux = getBest(db, "tvSeries", y, &ratingS, &votesS);
+            strcpy(line[4],aux);
+            free(aux);
             if(line[4][0]=='\0')
             {
                 for(int i=4; i<7; i++){
@@ -91,6 +106,7 @@ int main(int argcount, char* args[])
             }
             writeLine(query3, 7, vector);
         }
+
     }
     fclose(query1);
     fclose(query2);

@@ -18,7 +18,7 @@ size_t getAmount(imdbADT db, char* titleType, size_t year);
 
 void toBeginGenre(imdbADT imdb, size_t year);
 int hasNext(imdbADT imdb);
-char* next(imdbADT imdb, size_t* count);
+size_t next(imdbADT imdb, char * string);
 
 char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* votes);
 
