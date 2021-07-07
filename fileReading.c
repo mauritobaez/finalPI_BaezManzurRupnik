@@ -34,30 +34,10 @@ float textToFloat(char *text){
     return (float)atof(text);
 }
 */ //estan al pedo¿
-char* numToText(size_t num){
-    size_t aux = num;
-    size_t n = 0;
-    while(aux!=0)
-    {
-        aux /= 10;
-        n++;
-    }
-    char* ans = malloc(n+2);
-    CHECK_ALLOC(ans);
-    sprintf(ans, "%d", (int)num);
-    return ans;
+void numToText(size_t num, char * string){
+    sprintf(string, "%d", (int)num);
 }
 
-char* floatToText(float num){
-    int aux = (int)num;
-    size_t n = 0;
-    while(aux!=0)
-    {
-        aux /= 10;
-        n++;
-    }
-    char* ans = malloc(n+4);
-    CHECK_ALLOC(ans);
+void floatToText(float num, char * ans){
     sprintf(ans, "%.1f", num);
-    return ans;
 }

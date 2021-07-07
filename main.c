@@ -52,53 +52,44 @@ int main(int argcount, char* args[])
         size_t series = getAmount(db, "tvSeries", y);
         if( movies!=0 || series!=0 ) //si hay algo ese año
         {
-            char* q1[3];
-            q1[0] = numToText(y);
-            q1[1] = numToText(movies);
-            q1[2] = numToText(series);
-            writeLine(query1, 3, q1);
-            free(q1[0]);
-            free(q1[1]);
-            free(q1[2]);
+            char * vector[8] ={line[0], line[1], line[2], line[3], line[4],
+                               line[5], line[6], line[7]};
+            numToText(y, line[0]);
+            numToText(movies, line[1]);
+            numToText(series, line[2]);
+            writeLine(query1, 3, vector);
 
-            char* q3[7];
-            q3[0] = numToText(y);
+            //char* q3[7]; Esto es lo que estaba antes
+            numToText(y, line[0]);
             float ratingM;
             float ratingS;
             size_t votesM;
             size_t votesS;
-            q3[1] = getBest(db, "movie", y, &ratingM, &votesM);
-            if(q3[1]==NULL)
+            strcpy(line[1], getBest(db, "movie", y, &ratingM, &votesM));
+            if(line[1][0]=='\0')
             {
-                q3[1] = copyString("\\N");
-                q3[2] = copyString("\\N");
-                q3[3] = copyString("\\N");
+                for(int i=1; i<4; i++){
+                    strcpy(line[i], "\\N");
+                }
             }
             else
             {
-                q3[2] = numToText(votesM);
-                q3[3] = floatToText(ratingM);
+                numToText(votesM, line[2]);
+                floatToText(ratingM, line[3]);
             }
-            q3[4] = getBest(db, "tvSeries", y, &ratingS, &votesS);
-            if(q3[4]==NULL)
+            strcpy(line[4],getBest(db, "tvSeries", y, &ratingS, &votesS));
+            if(line[4][0]=='\0')
             {
-                q3[4] = copyString("\\N");
-                q3[5] = copyString("\\N");
-                q3[6] = copyString("\\N");
+                for(int i=4; i<7; i++){
+                    strcpy(line[i], "\\N");
+                }
             }
             else
             {
-                q3[5] = numToText(votesS);
-                q3[6] = floatToText(ratingS);
+                numToText(votesS, line[5]);
+                floatToText(ratingS, line[6]);
             }
-            writeLine(query3, 7, q3);
-            free(q3[0]);
-            free(q3[1]);
-            free(q3[2]);
-            free(q3[3]);
-            free(q3[4]);
-            free(q3[5]);
-            free(q3[6]);
+            writeLine(query3, 7, vector);
         }
     }
     fclose(query1);
