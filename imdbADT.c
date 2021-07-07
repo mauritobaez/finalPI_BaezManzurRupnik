@@ -179,13 +179,16 @@ char * next(imdbADT imdb, size_t* count){
     imdb->currentGenre = imdb->currentGenre->tail;
     return aux;
 }
+
 size_t getLastYear(imdbADT db){
-    return db->sizeAfter+db->yearZero-1;
+    return db->sizeAfter + db->yearZero - 1;
 }
+
 size_t getFirstYear(imdbADT db){
-    return db->yearZero-db->sizeBefore+1;
+    return db->yearZero - db->sizeBefore + 1;
 }
-size_t getAmount(imdbADT db, size_t year,char * titleType){
+
+size_t getAmount(imdbADT db, char * titleType, size_t year){
     size_t yearIdx;
     yearInfo** yearsVec;
     if(year >= db->yearZero){

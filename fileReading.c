@@ -36,3 +36,31 @@ size_t textToNum(char * text){
 float textToFloat(char *text){
     return (float)atof(text);
 }
+
+char* numToText(size_t num){
+    size_t aux = num;
+    size_t n = 0;
+    while(aux!=0)
+    {
+        aux /= 10;
+        n++;
+    }
+    char* ans = malloc(n+1);
+    CHECK_ALLOC(ans);
+    sprintf(ans, "%d", (int)num);
+    return ans;
+}
+
+char* floatToText(float num){
+    int aux = (int)num;
+    size_t n = 0;
+    while(aux!=0)
+    {
+        aux /= 10;
+        n++;
+    }
+    char* ans = malloc(n+3);
+    CHECK_ALLOC(ans);
+    sprintf(ans, "%.1f", num);
+    return ans;
+}
