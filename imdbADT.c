@@ -164,13 +164,12 @@ int hasNext(imdbADT imdb){
 }
 
 // devuelve una copia del current
-char * next(imdbADT imdb){
+char * next(imdbADT imdb, size_t* count){
     if(!hasNext(imdb)){
-        //algo malo pasa
-        // return NULL;
-        // ?
+        return NULL;
     }
     char * aux = copyString(imdb->currentGenre->genre);
+    *count = imdb->currentGenre->count;
     imdb->currentGenre = imdb->currentGenre->tail;
     return aux;
 }
