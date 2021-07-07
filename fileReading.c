@@ -45,7 +45,7 @@ char* numToText(size_t num){
         aux /= 10;
         n++;
     }
-    char* ans = malloc(n+1);
+    char* ans = malloc(n+2);
     CHECK_ALLOC(ans);
     sprintf(ans, "%d", (int)num);
     return ans;
@@ -59,7 +59,7 @@ char* floatToText(float num){
         aux /= 10;
         n++;
     }
-    char* ans = malloc(n+3);
+    char* ans = malloc(n+4);
     CHECK_ALLOC(ans);
     sprintf(ans, "%.1f", num);
     return ans;

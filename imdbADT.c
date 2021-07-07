@@ -44,6 +44,7 @@ static void freeList(TList list){
     if(list==NULL)
         return;
     freeList(list->tail);
+    free(list->genre);
     free(list);
 }
 
@@ -51,6 +52,8 @@ static void freeVector(yearInfo ** vector, size_t until){
     for(int i=0; i<until; i++){
         if(vector[i] != NULL){
             freeList(vector[i]->firstGenre);
+            free(vector[i]->bestSeries.name);
+            free(vector[i]->bestMovie.name);
             free(vector[i]);
         }
     }
@@ -150,6 +153,7 @@ static void query3(yearInfo* year, char* titleType, char* primaryTitle, float ro
     }
     if(bestInfo->name == NULL || votes > bestInfo->votes)
     {
+        free(bestInfo->name);
         bestInfo->name = copyString(primaryTitle);
         bestInfo->votes = votes;
         bestInfo->rating = rollsRoyce;
@@ -224,15 +228,21 @@ char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* v
         yearsVec = db->yearsBefore;
         yearIdx = db->yearZero - year;
     }
+    if(yearsVec[yearIdx]==NULL)
+        return NULL;
     char * aux = NULL;
     if(strcmp(titleType, "movie") == 0)
     {
+        if(yearsVec[yearIdx]->bestMovie.name==NULL)
+            return NULL;
         *rating = yearsVec[yearIdx]->bestMovie.rating;
         *votes = yearsVec[yearIdx]->bestMovie.votes;
         aux = copyString(yearsVec[yearIdx]->bestMovie.name);
     }
     else if (strcmp(titleType, "tvSeries") == 0)
     {
+        if(yearsVec[yearIdx]->bestSeries.name==NULL)
+            return NULL;
         *rating = yearsVec[yearIdx]->bestSeries.rating;
         *votes = yearsVec[yearIdx]->bestSeries.votes;
         aux = copyString(yearsVec[yearIdx]->bestSeries.name);

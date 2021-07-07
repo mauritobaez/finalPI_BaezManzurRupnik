@@ -12,12 +12,18 @@ int main(int argcount, char* args[])
         exit(1);
     }
     FILE * input;
-    input= fopen(args[1],"rt");
+    input = fopen(args[1],"rt");
     if(input==NULL){
         fprintf(stderr, "Error in path to file,must exist");
         exit(2);
     }
     char **line=readLine(input,DIM); // leo la primera linea que es el encabezado
+    for(int i=0 ; i<DIM ; i++)
+    {
+        free(line[i]);
+    }
+    free(line);
+
     size_t year;
     imdbADT db = newImdb();
     while((line=readLine(input,DIM))!=NULL){
@@ -25,6 +31,11 @@ int main(int argcount, char* args[])
         if(year!=0) {
             add(db, line[0], line[1], year, line[4], textToFloat(line[5]), textToNum(line[6]));
         }
+        for(int i=0 ; i<DIM ; i++)
+        {
+            free(line[i]);
+        }
+        free(line);
     }
     fclose(input);
     FILE * query1 = fopen("query1.csv","wt");
@@ -36,7 +47,7 @@ int main(int argcount, char* args[])
     for(size_t y = from ; y >= to ; y--)
     {
         size_t movies = getAmount(db, "movie", y);
-        size_t series = getAmount(db, "series", y);
+        size_t series = getAmount(db, "tvSeries", y);
         if( movies!=0 || series!=0 ) //si hay algo ese año
         {
             char* q1[3];
@@ -55,11 +66,29 @@ int main(int argcount, char* args[])
             size_t votesM;
             size_t votesS;
             q3[1] = getBest(db, "movie", y, &ratingM, &votesM);
-            q3[2] = numToText(votesM);
-            q3[3] = floatToText(ratingM);
-            q3[4] = getBest(db, "series", y, &ratingS, &votesS);
-            q3[5] = numToText(votesS);
-            q3[6] = floatToText(ratingS);
+            if(q3[1]==NULL)
+            {
+                q3[1] = copyString("\\N");
+                q3[2] = copyString("\\N");
+                q3[3] = copyString("\\N");
+            }
+            else
+            {
+                q3[2] = numToText(votesM);
+                q3[3] = floatToText(ratingM);
+            }
+            q3[4] = getBest(db, "tvSeries", y, &ratingS, &votesS);
+            if(q3[4]==NULL)
+            {
+                q3[4] = copyString("\\N");
+                q3[5] = copyString("\\N");
+                q3[6] = copyString("\\N");
+            }
+            else
+            {
+                q3[5] = numToText(votesS);
+                q3[6] = floatToText(ratingS);
+            }
             writeLine(query3, 7, q3);
             free(q3[0]);
             free(q3[1]);
@@ -70,6 +99,9 @@ int main(int argcount, char* args[])
             free(q3[6]);
         }
     }
-
+    fclose(query1);
+    fclose(query2);
+    fclose(query3);
+    freeImdb(db);
     return 0;
 }
