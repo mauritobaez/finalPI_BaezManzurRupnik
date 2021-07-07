@@ -1,7 +1,7 @@
 #include "fileReading.h"
 
-int readLine(FILE* input,size_t dim,char output[DIM][MAX_LONG]){
-    char line[MAX_LONG];
+int readLine(FILE* input, char output[DIM][MAX_LONG]){
+    char line[MAX_LONG * DIM];
     size_t i = 0;
     if(fgets(line,MAX_LONG,input) == NULL){
         return 0;
@@ -25,15 +25,15 @@ void writeLine(FILE* output, size_t dim, char** info)
     }
     fprintf(output, "%s\n", info[i]);
 }
-
-size_t textToNum(char * text){
-    return (size_t)atoi(text);
+/*
+int textToNum(char * text){
+    return atoi(text);
 }
 
 float textToFloat(char *text){
     return (float)atof(text);
 }
-
+*/ //estan al pedo¿
 char* numToText(size_t num){
     size_t aux = num;
     size_t n = 0;
