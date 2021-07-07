@@ -18,9 +18,21 @@ char ** readLine(FILE* input,size_t dim){
     }
     return output;
 }
+
+void writeLine(FILE* output, size_t dim, char** info)
+{
+    int i;
+    for(i=0 ; i < dim-1 ; i++)
+    {
+        fprintf(output, "%s;", info[i]);
+    }
+    fprintf(output, "%s\n", info[i]);
+}
+
 size_t textToNum(char * text){
     return (size_t)atoi(text);
 }
+
 float textToFloat(char *text){
     return (float)atof(text);
 }

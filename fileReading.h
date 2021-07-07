@@ -8,6 +8,7 @@
 #include "auxFunctions.h"
 
 char ** readLine(FILE* input,size_t dim);
+void writeLine(FILE* output, size_t dim, char** info);
 size_t textToNum(char * text);
 float textToFloat(char *text);
 #endif //TP_FINAL_PI_FILEREADING_H
