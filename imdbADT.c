@@ -211,3 +211,29 @@ size_t getAmount(imdbADT db, char * titleType, size_t year){
 }
 
 
+char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* votes){
+    size_t yearIdx;
+    yearInfo** yearsVec;
+    if(year >= db->yearZero){
+        yearsVec = db->yearsAfter;
+        yearIdx = year - db->yearZero;
+    }
+    else{
+        yearsVec = db->yearsBefore;
+        yearIdx = db->yearZero - year;
+    }
+    char * aux = NULL;
+    if(strcmp(titleType, "movie") == 0)
+    {
+        *rating = yearsVec[yearIdx]->bestMovie.rating;
+        *votes = yearsVec[yearIdx]->bestMovie.votes;
+        aux = copyString(yearsVec[yearIdx]->bestMovie.name);
+    }
+    else if (strcmp(titleType, "tvSeries") == 0)
+    {
+        *rating = yearsVec[yearIdx]->bestSeries.rating;
+        *votes = yearsVec[yearIdx]->bestSeries.votes;
+        aux = copyString(yearsVec[yearIdx]->bestSeries.name);
+    }
+    return aux;
+}
