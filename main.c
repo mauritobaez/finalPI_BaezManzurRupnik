@@ -59,7 +59,7 @@ int main(int argcount, char* args[])
             numToText(movies, line[1]);
             numToText(series, line[2]);
             writeLine(query1, 3, vector);
-
+            /*
             //query2
             toBeginGenre(db, y);
             size_t count;
@@ -68,7 +68,7 @@ int main(int argcount, char* args[])
                 numToText(count, line[2]);
                 writeLine(query2, 3, vector);
             }
-
+            */
             //query3
             //char* q3[7]; Esto es lo que estaba antes
             //numToText(y, line[0]); Ya está puesto el año
@@ -77,7 +77,9 @@ int main(int argcount, char* args[])
             size_t votesM;
             size_t votesS;
             char * aux = getBest(db, "movie", y, &ratingM, &votesM);
-            strcpy(line[1], aux);//podemos cambiarlo con la mejora de jamboard
+            if(aux!=NULL) {
+                strcpy(line[1], aux);//podemos cambiarlo con la mejora de jamboard
+            }
             free(aux);
             if(line[1][0]=='\0')
             {
@@ -91,7 +93,9 @@ int main(int argcount, char* args[])
                 floatToText(ratingM, line[3]);
             }
             aux = getBest(db, "tvSeries", y, &ratingS, &votesS);
-            strcpy(line[4],aux);
+            if(aux!=NULL) {
+                strcpy(line[4], aux);
+            }
             free(aux);
             if(line[4][0]=='\0')
             {
