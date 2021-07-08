@@ -1,12 +1,13 @@
 #ifndef TP_FINAL_PI_IMDBADT_H
 #define TP_FINAL_PI_IMDBADT_H
 #include <stdlib.h>
-#include "auxFunctions.h"
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #define SEPARATOR ","
 #define MAX_GENRES 9
+
 
 typedef struct imdbCDT * imdbADT;
 

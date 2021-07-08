@@ -1,6 +1,11 @@
 #include "imdbADT.h"
 
-
+#define BLOCK 10
+#define CHECK_ALLOC(x) {    if((x)==NULL || errno==ENOMEM)\
+                            {  fprintf(stderr, "Error. No more memory available.");\
+                                exit(3);\
+                            }\
+                        }
 //lista para generos (query2)
 typedef struct node{
     char * genre;
@@ -37,79 +42,32 @@ typedef struct imdbCDT{
     TList currentGenre;
 }imdbCDT;
 
-static void query1(yearInfo* year, char * titleType);
-static void query2(yearInfo* year, char * genre);
-static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rollsRoyce, size_t votes);
-
-static void freeList(TList list){
-    if(list==NULL)
-        return;
-    freeList(list->tail);
-    free(list->genre);
-    free(list);
-}
-
-static void freeVector(yearInfo ** vector, size_t until){
-    for(int i=0; i<until; i++){
-        if(vector[i] != NULL){
-            freeList(vector[i]->firstGenre);
-            free(vector[i]->bestSeries.name);
-            free(vector[i]->bestMovie.name);
-            free(vector[i]);
+static char * copyString(const char * string){
+    char * aux=NULL;
+    int dim=0;
+    while(*string != '\0'){
+        if(dim%BLOCK == 0){
+            aux = realloc(aux, dim + BLOCK);
+            CHECK_ALLOC(aux);
         }
+        aux[dim++] = *string;
+        string++;
     }
+    aux = realloc(aux, dim+1);
+    CHECK_ALLOC(aux);
+    aux[dim] = '\0';
+    return aux;
 }
-//libera el ADT
-void freeImdb(imdbADT imdb){
-    freeVector(imdb->yearsAfter, imdb->sizeAfter);
-    freeVector(imdb->yearsBefore, imdb->sizeBefore);
-    free(imdb->yearsAfter);
-    free(imdb->yearsBefore);
-    free(imdb);
-}
+
+///NEW
 //genera un nuevo ADT
 imdbADT newImdb(){
     imdbADT new = calloc(1, sizeof(imdbCDT));
     CHECK_ALLOC(new);
     return new;
 }
-//añade la película o serie al ADT, sí no lo puedo agregar porque el "year" == 0, retorna 0, sino 1
-int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
-    if(year==0)
-        return 0;
-    if(db->yearZero == 0){
-        db->yearZero = year;
-    }
-    yearInfo*** yearsVec;
-    size_t yearIdx;
-    size_t* currentSize;
-    if(year >= db->yearZero){
-        yearsVec = &db->yearsAfter;
-        yearIdx = year - db->yearZero;
-        currentSize = &db->sizeAfter;
-    }
-    else{
-        yearsVec = &db->yearsBefore;
-        yearIdx = db->yearZero - year;
-        currentSize = &db->sizeBefore;
-    }
-    if( yearIdx >= *currentSize ){
-        *yearsVec = realloc(*yearsVec, sizeof(yearInfo*) * (yearIdx + 1));
-        CHECK_ALLOC(*yearsVec);
-        memset(*yearsVec + *currentSize, 0, sizeof(yearInfo*) * (yearIdx + 1 - *currentSize));
-        *currentSize = yearIdx + 1;
-    }
-    if((*yearsVec)[yearIdx] == NULL)
-    {
-        (*yearsVec)[yearIdx] = calloc(1, sizeof(yearInfo));
-        CHECK_ALLOC((*yearsVec)[yearIdx]);
-    }
-    query1((*yearsVec)[yearIdx] ,titleType);
-    if(strcmp(titleType, "movie") == 0)
-        query2((*yearsVec)[yearIdx] ,genre);
-    query3((*yearsVec)[yearIdx] ,titleType,primaryTitle,rating,votes);
-    return 1;
-}
+
+///ADD
 
 static void query1(yearInfo* year, char * titleType){
     if(strcmp(titleType, "movie") == 0)
@@ -180,29 +138,44 @@ static void query3(yearInfo* year, char* titleType, char* primaryTitle, float ro
     }
 }
 
-//iterador por genero
-void toBeginGenre(imdbADT imdb, size_t year){
-    if(year>=imdb->yearZero) {
-        imdb->currentGenre = imdb->yearsAfter[year - imdb->yearZero]->firstGenre;
-    }
-    else
-        imdb->currentGenre = imdb->yearsBefore[-year+imdb->yearZero]->firstGenre;
-}
-
-int hasNext(imdbADT imdb){
-    return imdb->currentGenre !=NULL;
-}
-
-// devuelve una copia del current
-size_t next(imdbADT imdb, char * string){
-    if(!hasNext(imdb)){
+//añade la película o serie al ADT, sí no lo puedo agregar porque el "year" == 0, retorna 0, sino 1
+int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
+    if(year==0)
         return 0;
+    if(db->yearZero == 0){
+        db->yearZero = year;
     }
-    strcpy(string, imdb->currentGenre->genre);
-    size_t count = imdb->currentGenre->count;
-    imdb->currentGenre = imdb->currentGenre->tail;
-    return count;
+    yearInfo*** yearsVec;
+    size_t yearIdx;
+    size_t* currentSize;
+    if(year >= db->yearZero){
+        yearsVec = &db->yearsAfter;
+        yearIdx = year - db->yearZero;
+        currentSize = &db->sizeAfter;
+    }
+    else{
+        yearsVec = &db->yearsBefore;
+        yearIdx = db->yearZero - year;
+        currentSize = &db->sizeBefore;
+    }
+    if( yearIdx >= *currentSize ){
+        *yearsVec = realloc(*yearsVec, sizeof(yearInfo*) * (yearIdx + 1));
+        CHECK_ALLOC(*yearsVec);
+        memset(*yearsVec + *currentSize, 0, sizeof(yearInfo*) * (yearIdx + 1 - *currentSize));
+        *currentSize = yearIdx + 1;
+    }
+    if((*yearsVec)[yearIdx] == NULL)
+    {
+        (*yearsVec)[yearIdx] = calloc(1, sizeof(yearInfo));
+        CHECK_ALLOC((*yearsVec)[yearIdx]);
+    }
+    query1((*yearsVec)[yearIdx] ,titleType);
+    if(strcmp(titleType, "movie") == 0)
+        query2((*yearsVec)[yearIdx] ,genre);
+    query3((*yearsVec)[yearIdx] ,titleType,primaryTitle,rating,votes);
+    return 1;
 }
+
 
 size_t getLastYear(imdbADT db){
     if(db->yearZero==0) return 0;
@@ -214,6 +187,7 @@ size_t getFirstYear(imdbADT db){
     return db->yearZero - db->sizeBefore + 1;
 }
 
+///QUERY 1
 size_t getAmount(imdbADT db, char * titleType, size_t year){
     size_t yearIdx;
     yearInfo** yearsVec;
@@ -238,7 +212,32 @@ size_t getAmount(imdbADT db, char * titleType, size_t year){
     return 0;
 }
 
+///QUERY 2
+//iterador por genero
+void toBeginGenre(imdbADT imdb, size_t year){
+    if(year>=imdb->yearZero) {
+        imdb->currentGenre = imdb->yearsAfter[year - imdb->yearZero]->firstGenre;
+    }
+    else
+        imdb->currentGenre = imdb->yearsBefore[-year+imdb->yearZero]->firstGenre;
+}
 
+int hasNext(imdbADT imdb){
+    return imdb->currentGenre !=NULL;
+}
+
+// devuelve una copia del current
+size_t next(imdbADT imdb, char * string){
+    if(!hasNext(imdb)){
+        return 0;
+    }
+    strcpy(string, imdb->currentGenre->genre);
+    size_t count = imdb->currentGenre->count;
+    imdb->currentGenre = imdb->currentGenre->tail;
+    return count;
+}
+
+///QUERY 3
 char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* votes){
     size_t yearIdx;
     yearInfo** yearsVec;
@@ -270,4 +269,32 @@ char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* v
         aux = copyString(yearsVec[yearIdx]->bestSeries.name);
     }
     return aux;
+}
+
+///FREE
+static void freeList(TList list){
+    if(list==NULL)
+        return;
+    freeList(list->tail);
+    free(list->genre);
+    free(list);
+}
+
+static void freeVector(yearInfo ** vector, size_t until){
+    for(int i=0; i<until; i++){
+        if(vector[i] != NULL){
+            freeList(vector[i]->firstGenre);
+            free(vector[i]->bestSeries.name);
+            free(vector[i]->bestMovie.name);
+            free(vector[i]);
+        }
+    }
+}
+//libera el ADT
+void freeImdb(imdbADT imdb){
+    freeVector(imdb->yearsAfter, imdb->sizeAfter);
+    freeVector(imdb->yearsBefore, imdb->sizeBefore);
+    free(imdb->yearsAfter);
+    free(imdb->yearsBefore);
+    free(imdb);
 }
