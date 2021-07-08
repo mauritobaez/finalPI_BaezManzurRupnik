@@ -13,7 +13,7 @@ int main(int argcount, char* args[])
     //Se fija si la cantidad de argumentos es correcta
     if(argcount != 2)
     {
-        fprintf(stderr, "Error in amount of arguments expected. (one)");
+        fprintf(stderr, "Error in amount of arguments expected. (one)\n");
         exit(1);
     }
 
@@ -21,7 +21,7 @@ int main(int argcount, char* args[])
     FILE * input;
     input = fopen(args[1],"rt");
     if(input==NULL){
-        fprintf(stderr, "Error in path to file,must exist");
+        fprintf(stderr, "Error in path to file,must exist\n");
         exit(2);
     }
 
