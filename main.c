@@ -83,7 +83,7 @@ int main(int argcount, char* args[])
 
 
                 ///query2
-                /*
+
                 toBeginGenre(db, y);
                 size_t count;
                 while(hasNext(db)){
@@ -91,7 +91,7 @@ int main(int argcount, char* args[])
                     numToText(count, buffer[2]);
                     writeLine(query2, 3, buffer);
                 }
-                */
+
 
                 ///query3
                 float rating;

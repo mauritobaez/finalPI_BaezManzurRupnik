@@ -59,7 +59,7 @@ static void freeVector(yearInfo ** vector, size_t until){
         }
     }
 }
-
+//libera el ADT
 void freeImdb(imdbADT imdb){
     freeVector(imdb->yearsAfter, imdb->sizeAfter);
     freeVector(imdb->yearsBefore, imdb->sizeBefore);
@@ -67,14 +67,16 @@ void freeImdb(imdbADT imdb){
     free(imdb->yearsBefore);
     free(imdb);
 }
-
+//genera un nuevo ADT
 imdbADT newImdb(){
     imdbADT new = calloc(1, sizeof(imdbCDT));
     CHECK_ALLOC(new);
     return new;
 }
-
+//añade la película o serie al ADT, sí no lo puedo agregar porque el "year" == 0, retorna 0, sino 1
 int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
+    if(year==0)
+        return 0;
     if(db->yearZero == 0){
         db->yearZero = year;
     }
@@ -133,17 +135,19 @@ static TList addGenre(TList first, char * genre){
         first->tail = addGenre(first->tail, genre);
     return first;
 }
-
+//aventura,romance
 static void query2(yearInfo* year, char * genre){
     //hacer un char** con los distintos generos y ordenarlo
     //que addGenre no pare cuando agrega 1, sigue hasta que agregó todos los q estaban en el char**
     //hay q pasarle el char** por parámetro y la dimension, para que le pueda ir restando uno
+
     char * token;
     token = strtok(genre,SEPARATOR);
     while(token != NULL){
         year->firstGenre = addGenre(year->firstGenre, token);
         token = strtok(NULL,SEPARATOR);
     }
+
 }
 
 static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rollsRoyce, size_t votes){
@@ -171,8 +175,8 @@ static void query3(yearInfo* year, char* titleType, char* primaryTitle, float ro
 
 //iterador por genero
 void toBeginGenre(imdbADT imdb, size_t year){
-    if(year>imdb->yearZero){
-        imdb->currentGenre = imdb->yearsAfter[year - imdb->yearZero-1]->firstGenre;
+    if(year>=imdb->yearZero) {
+        imdb->currentGenre = imdb->yearsAfter[year - imdb->yearZero]->firstGenre;
     }
     else
         imdb->currentGenre = imdb->yearsBefore[-year+imdb->yearZero]->firstGenre;
