@@ -87,9 +87,9 @@ int main(int argcount, char* args[])
                 toBeginGenre(db, y);
                 size_t count;
                 while(hasNext(db)){
-                    count = next(db, line[1]);
-                    numToText(count, line[2]);
-                    writeLine(query2, 3, vector);
+                    count = next(db, buffer[1]);
+                    numToText(count, buffer[2]);
+                    writeLine(query2, 3, buffer);
                 }
                 */
 

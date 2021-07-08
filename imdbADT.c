@@ -1,5 +1,6 @@
 #include "imdbADT.h"
 
+#define SEPARATOR ","
 //lista para generos (query2)
 typedef struct node{
     char * genre;
@@ -137,7 +138,12 @@ static void query2(yearInfo* year, char * genre){
     //hacer un char** con los distintos generos y ordenarlo
     //que addGenre no pare cuando agrega 1, sigue hasta que agregó todos los q estaban en el char**
     //hay q pasarle el char** por parámetro y la dimension, para que le pueda ir restando uno
-    year->firstGenre = addGenre(year->firstGenre, genre);
+    char * token;
+    token = strtok(genre,SEPARATOR);
+    while(token != NULL){
+        year->firstGenre = addGenre(year->firstGenre, token);
+        token = strtok(NULL,SEPARATOR);
+    }
 }
 
 static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rollsRoyce, size_t votes){
