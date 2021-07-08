@@ -134,6 +134,9 @@ static TList addGenre(TList first, char * genre){
 }
 
 static void query2(yearInfo* year, char * genre){
+    //hacer un char** con los distintos generos y ordenarlo
+    //que addGenre no pare cuando agrega 1, sigue hasta que agregó todos los q estaban en el char**
+    //hay q pasarle el char** por parámetro y la dimension, para que le pueda ir restando uno
     year->firstGenre = addGenre(year->firstGenre, genre);
 }
 
@@ -185,10 +188,12 @@ size_t next(imdbADT imdb, char * string){
 }
 
 size_t getLastYear(imdbADT db){
+    if(db->yearZero==0) return 0;
     return db->sizeAfter + db->yearZero - 1;
 }
 
 size_t getFirstYear(imdbADT db){
+    if(db->yearZero==0) return 0;
     return db->yearZero - db->sizeBefore + 1;
 }
 

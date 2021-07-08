@@ -6,12 +6,15 @@
 
 int main(int argcount, char* args[])
 {
+    ///LECTURA DE DATOS DEL CSV
+    //Se fija si la cantidad de argumentos es correcta
     if(argcount != 2)
     {
         fprintf(stderr, "Error in amount of arguments expected. (one)");
         exit(1);
     }
 
+    //Se fija que exista el archivo de input en el path indicado
     FILE * input;
     input = fopen(args[1],"rt");
     if(input==NULL){
@@ -19,99 +22,114 @@ int main(int argcount, char* args[])
         exit(2);
     }
 
-    char line[DIM][MAX_LONG] = {0};
-    readLine(input, line); // leo la primera linea que es el encabezado
+
+    char buffer[DIM][MAX_LONG] = {0}; //En principio, se guardará acá la información leída por cada línea
+
+    //Se lee la primera linea, que es el encabezado
+    readLine(input, buffer);
+
     int year;
     imdbADT db = newImdb();
-    while(readLine(input, line)!=0){ //si el archivo está vacio? q pasa?
-        year = atoi(line[2]);
-        if(year > 0) { //si en el campo del año no hay un numero positivo, no lo tomamos en cuenta
-            add(db, line[0], line[1], (size_t)year, line[4], (float)atof(line[5]), (size_t)atoi(line[6]));
+
+    while(readLine(input, buffer)!=0){ //Cuando se haya terminado de leer el archivo, salimos del while
+        year = atoi(buffer[2]); //Extraemos el año del renglón leído
+        if(year > 0) { //Si en el campo del año no hay un numero positivo, no lo tomamos en cuenta
+            //Le pasamos al ADT los datos relevantes que necesita sobre este renglón leído
+            add(db, buffer[0], buffer[1], (size_t)year, buffer[4], (float)atof(buffer[5]), (size_t)atoi(buffer[6]));
         }
     }
     fclose(input);
+
+    ///ESCRITURA DE ARCHIVOS DE SALIDA
     FILE * query1 = fopen("query1.csv","wt");
     FILE * query2 = fopen("query2.csv","wt");
     FILE * query3 = fopen("query3.csv","wt");
 
-    char * titles[7] = {"year","films","series","ratingFilm","serie","votesSerie","ratingSerie"};
-    writeLine(query1,3,titles);
-    titles[1] = "genre";
-    titles[2] = "films";
-    writeLine(query2,3,titles);
-    titles[0] = "startYear";
-    titles[1] = "films";
-    titles[2] = "votesFilm";
-    writeLine(query3, 7, titles);
+    //Escribimos el encabezado de cada archivo
+    strcpy(buffer[0], "year");
+    strcpy(buffer[1], "films");
+    strcpy(buffer[2], "series");
+    writeLine(query1,3,buffer);
 
+    strcpy(buffer[1], "genre");
+    strcpy(buffer[2], "films");
+    writeLine(query2,3, buffer);
+
+    strcpy(buffer[0], "startYear");
+    strcpy(buffer[1], "films");
+    strcpy(buffer[2], "votesFilm");
+    strcpy(buffer[3], "ratingFilm");
+    strcpy(buffer[4], "serie");
+    strcpy(buffer[5], "votesSerie");
+    strcpy(buffer[6], "ratingSerie");
+    writeLine(query3, 7, buffer);
+
+    //obtenemos los años más reciente y más antiguo
     size_t from = getLastYear(db);
     size_t to = getFirstYear(db);
-    for(size_t y = from ; y >= to ; y--)
+    if(from != 0 && to != 0) //  Si no hubo ningún título con año identificado => from=to=0
     {
-        size_t movies = getAmount(db, "movie", y);
-        size_t series = getAmount(db, "tvSeries", y);
-        if( movies!=0 || series!=0 ) //si hay algo ese año
+        for(size_t y = from ; y >= to ; y--) //Recorremos todos los años entre el último y el primero.
         {
-            //query1
-            char * vector[8] ={line[0], line[1], line[2], line[3], line[4],
-                               line[5], line[6], line[7]};
-            numToText(y, line[0]);
-            numToText(movies, line[1]);
-            numToText(series, line[2]);
-            writeLine(query1, 3, vector);
-            /*
-            //query2
-            toBeginGenre(db, y);
-            size_t count;
-            while(hasNext(db)){
-                count = next(db, line[1]);
-                numToText(count, line[2]);
-                writeLine(query2, 3, vector);
-            }
-            */
-            //query3
-            //char* q3[7]; Esto es lo que estaba antes
-            //numToText(y, line[0]); Ya está puesto el año
-            float ratingM;
-            float ratingS;
-            size_t votesM;
-            size_t votesS;
-            char * aux = getBest(db, "movie", y, &ratingM, &votesM);
-            if(aux!=NULL) {
-                strcpy(line[1], aux);//podemos cambiarlo con la mejora de jamboard
-            }
-            free(aux);
-            if(line[1][0]=='\0')
+            size_t movies = getAmount(db, "movie", y);
+            size_t series = getAmount(db, "tvSeries", y);
+            if( movies!=0 || series!=0 ) //si hubo algún título ese año
             {
-                for(int i=1; i<4; i++){
-                    strcpy(line[i], "\\N");
-                }
-            }
-            else
-            {
-                numToText(votesM, line[2]);
-                floatToText(ratingM, line[3]);
-            }
-            aux = getBest(db, "tvSeries", y, &ratingS, &votesS);
-            if(aux!=NULL) {
-                strcpy(line[4], aux);
-            }
-            free(aux);
-            if(line[4][0]=='\0')
-            {
-                for(int i=4; i<7; i++){
-                    strcpy(line[i], "\\N");
-                }
-            }
-            else
-            {
-                numToText(votesS, line[5]);
-                floatToText(ratingS, line[6]);
-            }
-            writeLine(query3, 7, vector);
-        }
+                ///query1
+                numToText(y, buffer[0]);
+                numToText(movies, buffer[1]);
+                numToText(series, buffer[2]);
+                writeLine(query1, 3, buffer);
 
+
+                ///query2
+                /*
+                toBeginGenre(db, y);
+                size_t count;
+                while(hasNext(db)){
+                    count = next(db, line[1]);
+                    numToText(count, line[2]);
+                    writeLine(query2, 3, vector);
+                }
+                */
+
+                ///query3
+                float rating;
+                size_t votes;
+                //El año ya está en buffer[0]
+                char * aux = getBest(db, "movie", y, &rating, &votes);
+                if(aux!=NULL) {
+                    strcpy(buffer[1], aux);
+                    numToText(votes, buffer[2]);
+                    floatToText(rating, buffer[3]);
+                }
+                else //si no hubo películas ese año
+                {
+                    for(int i=1; i<=3; i++){
+                        strcpy(buffer[i], "\\N");
+                    }
+                }
+                free(aux);
+
+                aux = getBest(db, "tvSeries", y, &rating, &votes);
+                if(aux!=NULL) {
+                    strcpy(buffer[4], aux);
+                    numToText(votes, buffer[5]);
+                    floatToText(rating, buffer[6]);
+                }
+                else //si no hubo series ese año
+                {
+                    for(int i=4; i<=6; i++){
+                        strcpy(buffer[i], "\\N");
+                    }
+                }
+                free(aux);
+
+                writeLine(query3, 7, buffer);
+            }
+        }
     }
+
     fclose(query1);
     fclose(query2);
     fclose(query3);

@@ -16,24 +16,17 @@ int readLine(FILE* input, char output[DIM][MAX_LONG]){
     return 1;
 }
 
-void writeLine(FILE* output, size_t dim, char** info)
-{
+void writeLine(FILE* output, size_t dim, char info[DIM][MAX_LONG]){
     int i;
+    if(dim>DIM)
+        return;
     for(i=0 ; i < dim-1 ; i++)
     {
         fprintf(output, "%s;", info[i]);
     }
     fprintf(output, "%s\n", info[i]);
 }
-/*
-int textToNum(char * text){
-    return atoi(text);
-}
 
-float textToFloat(char *text){
-    return (float)atof(text);
-}
-*/ //estan al pedo¿
 void numToText(size_t num, char * string){
     sprintf(string, "%d", (int)num);
 }
