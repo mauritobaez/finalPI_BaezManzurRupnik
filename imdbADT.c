@@ -135,7 +135,7 @@ static TList addGenre(TList first, char * genre){
         first->tail = addGenre(first->tail, genre);
     return first;
 }
-//aventura,romance
+
 static void query2(yearInfo* year, char * genre){
     //hacer un char** con los distintos generos y ordenarlo
     //que addGenre no pare cuando agrega 1, sigue hasta que agregó todos los q estaban en el char**

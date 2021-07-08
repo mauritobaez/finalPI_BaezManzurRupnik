@@ -1,11 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "imdbADT.h"
 #include "fileReading.h"
 
 
 int main(int argcount, char* args[])
 {
+    clock_t start = clock();
+
     ///LECTURA DE DATOS DEL CSV
     //Se fija si la cantidad de argumentos es correcta
     if(argcount != 2)
@@ -134,5 +137,10 @@ int main(int argcount, char* args[])
     fclose(query2);
     fclose(query3);
     freeImdb(db);
+
+    clock_t stop = clock();
+    double elapsed = (double) (stop - start) / CLOCKS_PER_SEC;
+    printf("\nTime elapsed: %.5f\n", elapsed);
+
     return 0;
 }

@@ -3,7 +3,7 @@
 int readLine(FILE* input, char output[DIM][MAX_LONG]){
     char line[MAX_LONG * DIM];
     size_t i = 0;
-    if(fgets(line,MAX_LONG,input) == NULL){
+    if(fgets(line,MAX_LONG * DIM,input) == NULL){
         return 0;
     }
     char * token;
