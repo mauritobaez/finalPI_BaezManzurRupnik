@@ -25,7 +25,7 @@ int main(int argcount, char* args[])
 
     char buffer[DIM][MAX_LONG] = {0}; //En principio, se guardará acá la información leída por cada línea
 
-    //Se lee la primera linea, que es el encabezado
+    //Se lee la primera línea, que es el encabezado
     readLine(input, buffer);
 
     int year;
