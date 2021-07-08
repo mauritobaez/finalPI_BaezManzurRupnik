@@ -86,7 +86,6 @@ int main(int argcount, char* args[])
 
 
                 ///query2
-
                 toBeginGenre(db, y);
                 size_t count;
                 while(hasNext(db)){
