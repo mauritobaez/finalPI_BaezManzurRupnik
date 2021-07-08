@@ -67,7 +67,7 @@ int main(int argcount, char* args[])
     strcpy(buffer[6], "ratingSerie");
     writeLine(query3, 7, buffer);
 
-    //obtenemos los años más reciente y más antiguo
+    //Obtenemos los años más reciente y más antiguo
     size_t from = getLastYear(db);
     size_t to = getFirstYear(db);
     if(from != 0 && to != 0) //  Si no hubo ningún título con año identificado => from=to=0
@@ -76,7 +76,7 @@ int main(int argcount, char* args[])
         {
             size_t movies = getAmount(db, "movie", y);
             size_t series = getAmount(db, "tvSeries", y);
-            if( movies!=0 || series!=0 ) //si hubo algún título ese año
+            if( movies!=0 || series!=0 ) //Si hubo algún título ese año
             {
                 ///query1
                 numToText(y, buffer[0]);
@@ -105,7 +105,7 @@ int main(int argcount, char* args[])
                     numToText(votes, buffer[2]);
                     floatToText(rating, buffer[3]);
                 }
-                else //si no hubo películas ese año
+                else //Si no hubo películas ese año
                 {
                     for(int i=1; i<=3; i++){
                         strcpy(buffer[i], "\\N");
@@ -119,7 +119,7 @@ int main(int argcount, char* args[])
                     numToText(votes, buffer[5]);
                     floatToText(rating, buffer[6]);
                 }
-                else //si no hubo series ese año
+                else //Si no hubo series ese año
                 {
                     for(int i=4; i<=6; i++){
                         strcpy(buffer[i], "\\N");
@@ -131,7 +131,7 @@ int main(int argcount, char* args[])
             }
         }
     }
-
+    //Se cierran los archivos ya escritos, y se liberan los recursos usados del ADT
     fclose(query1);
     fclose(query2);
     fclose(query3);
