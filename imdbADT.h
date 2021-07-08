@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define SEPARATOR ","
+#define MAX_GENRES 9
+
 typedef struct imdbCDT * imdbADT;
 
 imdbADT newImdb();

@@ -1,6 +1,6 @@
 #include "imdbADT.h"
 
-#define SEPARATOR ","
+
 //lista para generos (query2)
 typedef struct node{
     char * genre;
@@ -118,36 +118,43 @@ static void query1(yearInfo* year, char * titleType){
         year->amountSeries++;
 }
 
-static TList addGenre(TList first, char * genre){
+static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){
     int c;
-    if(first==NULL || (c=strcmp(first->genre, genre)) >0){
+    if(dim==0)
+    {
+        return first;
+    }
+    if(first==NULL || (c=strcmp(first->genre, genres[0])) >0){
         TList new = malloc(sizeof(TNode));
         CHECK_ALLOC(new);
-        new->genre = copyString(genre);
-        new->count=1;
-        new->tail=first;
+        new->genre = copyString(genres[0]);
+        new->count = 1;
+        new->tail = addGenre(first, genres+1, dim-1);
         return new;
     }
-    else if(!c){
+    else if(c == 0){
         first->count++;
+        first->tail = addGenre(first->tail, genres+1, dim-1);
     }
     else
-        first->tail = addGenre(first->tail, genre);
+        first->tail = addGenre(first->tail, genres, dim);
     return first;
 }
 
-static void query2(yearInfo* year, char * genre){
-    //hacer un char** con los distintos generos y ordenarlo
-    //que addGenre no pare cuando agrega 1, sigue hasta que agregó todos los q estaban en el char**
-    //hay q pasarle el char** por parámetro y la dimension, para que le pueda ir restando uno
-
-    char * token;
-    token = strtok(genre,SEPARATOR);
-    while(token != NULL){
-        year->firstGenre = addGenre(year->firstGenre, token);
-        token = strtok(NULL,SEPARATOR);
+static void query2(yearInfo* year, char * genreText){
+    char* genres[MAX_GENRES];
+    int c = 0;
+    genres[c] = strtok(genreText, SEPARATOR);
+    if(genres[c]!=NULL)
+        c++;
+    while(c<MAX_GENRES && (genres[c] = strtok(NULL, SEPARATOR)) != NULL)
+    {
+        c++;
     }
 
+    qsort(genres, c, sizeof(char*), (int (*)(const void *, const void*)) strcmp);
+
+    year->firstGenre = addGenre(year->firstGenre, genres, c);
 }
 
 static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rollsRoyce, size_t votes){

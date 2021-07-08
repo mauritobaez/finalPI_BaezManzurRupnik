@@ -2,6 +2,7 @@
 #define TP_FINAL_PI_AUXFUNCTIONS_H
 
 #include <stdio.h>
+#define BLOCK 10
 
 #define CHECK_ALLOC(x) {    if((x)==NULL)\
                             {  fprintf(stderr, "Error. No more memory available.");\

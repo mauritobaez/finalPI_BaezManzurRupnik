@@ -1,7 +1,7 @@
 #include "auxFunctions.h"
 #include <stdlib.h>
 
-#define BLOCK 10
+
 char * copyString(const char * string){
     char * aux=NULL;
     int dim=0;
