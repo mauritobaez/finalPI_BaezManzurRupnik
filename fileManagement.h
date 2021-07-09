@@ -15,7 +15,5 @@ void writeLine(FILE* output, size_t dim, char info[DIM][MAX_LONG]);
 void numToText(size_t num, char * string);
 //Se carga el float dado al string que se recibe como parámetro
 void floatToText(float num, char * ans);
-//Se cargan los valores para escribir el query3
-void loadQuery3(char * name, int fromColumn, char buffer[][MAX_LONG], size_t votes, float rating);
 
 #endif //TP_FINAL_PI_FILEREADING_H

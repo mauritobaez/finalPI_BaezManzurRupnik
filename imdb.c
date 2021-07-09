@@ -3,6 +3,8 @@
 #include "imdbADT.h"
 #include "fileManagement.h"
 
+//Se cargan los valores para escribir el query3
+void loadQuery3(char * name, int fromColumn, char buffer[][MAX_LONG], size_t votes, float rating);
 
 int main(int argcount, char* args[])
 {
@@ -120,4 +122,19 @@ int main(int argcount, char* args[])
     freeImdb(db);
 
     return 0;
+}
+
+//Carga en el buffer los valores necesarios para el query3
+void loadQuery3(char * name, int fromColumn, char buffer[][MAX_LONG], size_t votes, float rating){
+    if(name!=NULL){
+        strcpy(buffer[fromColumn], name);
+        numToText(votes, buffer[fromColumn+1]);
+        floatToText(rating, buffer[fromColumn+2]);
+    }
+        //si no hubo series/películas
+    else{
+        for(int i=0; i<=2; i++){
+            strcpy(buffer[fromColumn+i],"\\N");
+        }
+    }
 }

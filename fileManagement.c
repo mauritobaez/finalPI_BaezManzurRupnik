@@ -34,18 +34,3 @@ void numToText(size_t num, char * string){  //Se carga el entero dado al string 
 void floatToText(float num, char * ans){    //Se carga el float dado al string que se recibe como parámetro
     sprintf(ans, "%.1f", num);
 }
-
-//Carga en el buffer los valores necesarios para el query3
-void loadQuery3(char * name, int fromColumn, char buffer[][MAX_LONG], size_t votes, float rating){
-    if(name!=NULL){
-        strcpy(buffer[fromColumn], name);
-        numToText(votes, buffer[fromColumn+1]);
-        floatToText(rating, buffer[fromColumn+2]);
-    }
-    //si no hubo series/películas
-    else{
-        for(int i=0; i<=2; i++){
-            strcpy(buffer[fromColumn+i],"\\N");
-        }
-    }
-}
