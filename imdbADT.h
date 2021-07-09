@@ -32,7 +32,9 @@ int hasNext(imdbADT imdb);
 //Devuelve la cantidad de películas y, por parámetro, el nombre del género
 size_t next(imdbADT imdb, char * string);
 
-//Devuelve el nombre de la mejor película o serie y, por parámetro, el rating y la cantidad de votos de la misma. Si no hubo películas ni series ese año se devuelve NULL.
+//Devuelve el nombre de la mejor película o serie y, por parámetro, el rating y la cantidad de votos de la misma.
+// Si no hubo películas ni series ese año se devuelve NULL.
+// Si no hay espacio en la memoria para guardar el nombre de la pelicula/serie tambien devuelve NULL
 char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* votes);
 
 //Libera el ADT

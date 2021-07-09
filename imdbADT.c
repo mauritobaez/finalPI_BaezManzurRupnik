@@ -91,7 +91,7 @@ static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){   //Re
     if(first==NULL || (c=strcmp(first->genre, genres[0])) > 0){  //Se crea el género y se agrega a la lista pero se sigue iterando
         errno = 0;
         TList new = malloc(sizeof(TNode));
-        CHECK_ALLOC(new, first);
+        CHECK_ALLOC(new, first);           //Si no hay memoria suficiente deja de agregar y setea errno=ENOMEM
         new->genre = copyString(genres[0]);
         new->count = 1;
         new->tail = addGenre(first, genres+1, dim-1);
@@ -108,7 +108,7 @@ static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){   //Re
     return first;
 }
 
-static void query2(yearInfo* year, char * genreText){
+static void query2(yearInfo* year, char * genreText){//De no tener lugar en la memoria deja de agregar generos
     char* genres[MAX_GENRES];   // Se crea un vector de géneros respectivos a la película con una Dim fija
     int c = 0;
     genres[c] = strtok(genreText, SEPARATOR);   //Se los separa en Tokens delimitados por una ","
@@ -147,7 +147,7 @@ static void query3(yearInfo* year, char* titleType, char* primaryTitle, float ro
     }
 }
 
-//Añade la película o serie al ADT, si no lo pudo agregar porque el "year" == 0, retorna 0, sino 1
+//Añade la película o serie al ADT, si no lo pudo agregar porque el "year" == 0 o porque no hay espacio(errno==ENOMEM), retorna 0, sino 1
 int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
     if(year==0)
         return 0;
