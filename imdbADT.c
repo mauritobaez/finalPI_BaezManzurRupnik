@@ -2,9 +2,9 @@
 
 #define BLOCK 10
 //Macro para chequear que haya memoria suficiente cuando se realiza un malloc, calloc o realloc
-#define CHECK_ALLOC(x) {    if((x)==NULL || errno==ENOMEM)\
-                            {  fprintf(stderr, "Error. No more memory available.\n");\
-                                exit(3);\
+#define CHECK_ALLOC(x,y) {    if((x)==NULL || errno==ENOMEM)\
+                            {   errno=ENOMEM;\
+                                return (y);\
                             }\
                         }
 
@@ -45,27 +45,31 @@ typedef struct imdbCDT{
 }imdbCDT;
 
 static char * copyString(const char * string){  //Funcion auxiliar para copiar strings en el heap en forma de bloques
-    char * aux=NULL;
+    char * aux=NULL;                            //Si no alcanza la memoria, devuelve NULL y setea errno en ENOMEM
     int dim=0;
     while(*string != '\0'){
         if(dim%BLOCK == 0){
+            errno = 0;
             aux = realloc(aux, dim + BLOCK);
-            CHECK_ALLOC(aux);
+            CHECK_ALLOC(aux, NULL);
         }
         aux[dim++] = *string;
         string++;
     }
+    errno = 0;
     aux = realloc(aux, dim+1);
-    CHECK_ALLOC(aux);
+    CHECK_ALLOC(aux, NULL);
     aux[dim] = '\0';
     return aux;
 }
 
 ///NEW
 //Genera un nuevo ADT
+//Si no alcanza la memoria, devuelve NULL y setea errno en ENOMEM
 imdbADT newImdb(){
+    errno = 0;
     imdbADT new = calloc(1, sizeof(imdbCDT));
-    CHECK_ALLOC(new);
+    CHECK_ALLOC(new, NULL);
     return new;
 }
 
@@ -78,15 +82,16 @@ static void query1(yearInfo* year, char * titleType){   //Se diferencia si es un
         year->amountSeries++;
 }
 
-static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){ //Recibe todos los géneros (ordenados) a los que se les debe incrementar su contador
-    int c;
+static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){   //Recibe todos los géneros (ordenados) a los que se les debe incrementar su contador
+    int c;                                                                  //Si no alcanzó la memoria, setea errno en ENOMEM
     if(dim==0)  //Si se llega a dim==0 entonces no hay mas géneros por los cuales se deba iterar en la lista
     {
         return first;
     }
     if(first==NULL || (c=strcmp(first->genre, genres[0])) > 0){  //Se crea el género y se agrega a la lista pero se sigue iterando
+        errno = 0;
         TList new = malloc(sizeof(TNode));
-        CHECK_ALLOC(new);
+        CHECK_ALLOC(new, first);
         new->genre = copyString(genres[0]);
         new->count = 1;
         new->tail = addGenre(first, genres+1, dim-1);
@@ -97,7 +102,9 @@ static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){ //Reci
         first->tail = addGenre(first->tail, genres+1, dim-1);
     }
     else    //No es el género indicado, entonces sigue buscando
+    {
         first->tail = addGenre(first->tail, genres, dim);
+    }
     return first;
 }
 
@@ -161,15 +168,17 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
         currentSize = &db->sizeBefore;
     }
     if( yearIdx >= *currentSize ){  //Si no hay espacio suficiente para ese año se crean espacios hasta ese año respectivo
+        errno = 0;
         *yearsVec = realloc(*yearsVec, sizeof(yearInfo*) * (yearIdx + 1));
-        CHECK_ALLOC(*yearsVec);
+        CHECK_ALLOC(*yearsVec,0);
         memset(*yearsVec + *currentSize, 0, sizeof(yearInfo*) * (yearIdx + 1 - *currentSize));
         *currentSize = yearIdx + 1;
     }
     if((*yearsVec)[yearIdx] == NULL)    //Si en ese año no hubieron títulos hasta ahora (==NULL), se reserva el espacio correspondiente
     {
+        errno = 0;
         (*yearsVec)[yearIdx] = calloc(1, sizeof(yearInfo));
-        CHECK_ALLOC((*yearsVec)[yearIdx]);
+        CHECK_ALLOC((*yearsVec)[yearIdx], 0);
     }
     query1((*yearsVec)[yearIdx] ,titleType);    //Se aumenta el contador de la Query1
     if(strcmp(titleType, "movie") == 0)         //Solo si es una película se lo envía a la query2
