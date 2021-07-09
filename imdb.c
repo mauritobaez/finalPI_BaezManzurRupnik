@@ -1,7 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <errno.h>
 #include "imdbADT.h"
 #include "fileManagement.h"
+
+#define MEMORY_ERROR { if(errno==ENOMEM) \
+                        {                \
+                            fprintf(stderr, "Error, No more memory available!\n"); \
+                            exit(3);     \
+                        }                \
+                        }
 
 //Se cargan los valores para escribir el query3
 void loadQuery3(char * name, int fromColumn, char buffer[][MAX_LONG], size_t votes, float rating);
@@ -32,12 +40,14 @@ int main(int argcount, char* args[])
 
     int year;
     imdbADT db = newImdb();
+    MEMORY_ERROR;
 
     while(readLine(input, buffer)!=0){ //Cuando se haya terminado de leer el archivo, salimos del while
         year = atoi(buffer[2]); //Extraemos el año del renglón leído
         if(year > 0) { //Si en el campo del año no hay un numero positivo, no lo tomamos en cuenta
             //Le pasamos al ADT los datos relevantes que necesita sobre este renglón leído
             add(db, buffer[0], buffer[1], (size_t)year, buffer[4], (float)atof(buffer[5]), (size_t)atoi(buffer[6]));
+            MEMORY_ERROR;
         }
     }
     fclose(input);
@@ -104,10 +114,12 @@ int main(int argcount, char* args[])
                 size_t votes;
                 //El año ya está en buffer[0]
                 char * aux = getBest(db, "movie", y, &rating, &votes);
+                MEMORY_ERROR;
                 loadQuery3(aux, 1, buffer, votes, rating);
                 free(aux);
 
                 aux = getBest(db, "tvSeries", y, &rating, &votes);
+                MEMORY_ERROR;
                 loadQuery3(aux, 4, buffer, votes, rating);
                 free(aux);
 

@@ -182,8 +182,12 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
     }
     query1((*yearsVec)[yearIdx] ,titleType);    //Se aumenta el contador de la Query1
     if(strcmp(titleType, "movie") == 0)         //Solo si es una película se lo envía a la query2
+    {
         query2((*yearsVec)[yearIdx] ,genre);
+        if(errno == ENOMEM) return 0;
+    }
     query3((*yearsVec)[yearIdx] ,titleType,primaryTitle,rating,votes);  //Se lo envía a la Query3
+    if(errno == ENOMEM) return 0;
     return 1;
 }
 
