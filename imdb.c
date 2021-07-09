@@ -102,11 +102,11 @@ int main(int argcount, char* args[])
                 size_t votes;
                 //El año ya está en buffer[0]
                 char * aux = getBest(db, "movie", y, &rating, &votes);
-                loadQuery3(aux, "movie", buffer, votes, rating);
+                loadQuery3(aux, 1, buffer, votes, rating);
                 free(aux);
 
                 aux = getBest(db, "tvSeries", y, &rating, &votes);
-                loadQuery3(aux, "tvSeries", buffer, votes, rating);
+                loadQuery3(aux, 4, buffer, votes, rating);
                 free(aux);
 
                 writeLine(query3, 7, buffer);
