@@ -96,36 +96,17 @@ int main(int argcount, char* args[])
                     writeLine(query2, 3, buffer);
                 }
 
+
                 //Escribimos el renglón de ese año en query3.csv
                 float rating;
                 size_t votes;
-
+                //El año ya está en buffer[0]
                 char * aux = getBest(db, "movie", y, &rating, &votes);
-                if(aux!=NULL) {
-                    strcpy(buffer[1], aux);
-                    numToText(votes, buffer[2]);
-                    floatToText(rating, buffer[3]);
-                }
-                else //Si no hubo películas ese año
-                {
-                    for(int i=1; i<=3; i++){
-                        strcpy(buffer[i], "\\N"); //Completamos con \N
-                    }
-                }
+                loadQuery3(aux, "movie", buffer, votes, rating);
                 free(aux);
 
                 aux = getBest(db, "tvSeries", y, &rating, &votes);
-                if(aux!=NULL) {
-                    strcpy(buffer[4], aux);
-                    numToText(votes, buffer[5]);
-                    floatToText(rating, buffer[6]);
-                }
-                else //Si no hubo series ese año
-                {
-                    for(int i=4; i<=6; i++){
-                        strcpy(buffer[i], "\\N"); //Completamos con \N
-                    }
-                }
+                loadQuery3(aux, "tvSeries", buffer, votes, rating);
                 free(aux);
 
                 writeLine(query3, 7, buffer);

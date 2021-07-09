@@ -11,5 +11,6 @@ int readLine(FILE* input, char line[DIM][MAX_LONG]);
 void writeLine(FILE* output, size_t dim, char info[DIM][MAX_LONG]);
 void numToText(size_t num, char * string);
 void floatToText(float num, char * ans);
+void loadQuery3(char * name, char * titleType, char buffer[][MAX_LONG], size_t votes, float rating);
 
 #endif //TP_FINAL_PI_FILEREADING_H

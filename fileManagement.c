@@ -34,3 +34,26 @@ void numToText(size_t num, char * string){//Se carga el entero dado al string qu
 void floatToText(float num, char * ans){//Se carga el float dado al string que se recibe como parámetro
     sprintf(ans, "%.1f", num);
 }
+
+
+void loadQuery3(char * name, char * titleType, char buffer[][MAX_LONG], size_t votes, float rating){
+    int indexes[3] = {4,5,6}; //predeterminado es de tipo tvSeries
+    if(strcmp(titleType, "movie")==0){
+        indexes[0] = 1;
+        indexes[1] = 2;
+        indexes[2] = 3;
+    }
+    //De agregar otro tipo de títulos como "podcast", habría que cambiar
+    //a un else if strcmp con "tvSeries" y otro con podcasts
+    if(name!=NULL){
+        strcpy(buffer[indexes[0]], name);
+        numToText(votes, buffer[indexes[1]]);
+        floatToText(rating, buffer[indexes[2]]);
+    }
+    //si no hubo series/películas
+    else{
+        for(int i=indexes[0]; i<=indexes[2]; i++){
+            strcpy(buffer[i],"\\N");
+        }
+    }
+}
