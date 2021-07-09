@@ -5,14 +5,16 @@
 #include <string.h>
 #include <errno.h>
 
-#define SEPARATOR ","
-#define MAX_GENRES 9
+#define SEPARATOR "," //Separador entre géneros
+#define MAX_GENRES 9  //Máxima cantidad de géneros que se leeran por película
 
 
 typedef struct imdbCDT * imdbADT;
 
+//Genera un nuevo ADT
 imdbADT newImdb();
 
+//Añade la película o serie al ADT, si no lo pudo agregar retorna 0, sino 1
 int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes);
 
 size_t getLastYear(imdbADT db);

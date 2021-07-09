@@ -45,6 +45,8 @@ int main(int argcount, char* args[])
     FILE * query2 = fopen("query2.csv","wt");
     FILE * query3 = fopen("query3.csv","wt");
 
+    //Para escribir lineas en los archivos usamos el mismo buffer que anteriormente con la función writeLine
+
     //Escribimos el encabezado de cada archivo
     strcpy(buffer[0], "year");
     strcpy(buffer[1], "films");
@@ -67,35 +69,37 @@ int main(int argcount, char* args[])
     //Obtenemos los años más reciente y más antiguo
     size_t from = getLastYear(db);
     size_t to = getFirstYear(db);
-    if(from != 0 && to != 0) //  Si no hubo ningún título con año identificado => from=to=0
+    if(from != 0 && to != 0) //  Si no hubieron títulos con año identificado => from=to=0 => no hacemos nada
     {
-        for(size_t y = from ; y >= to ; y--) //Recorremos todos los años entre el último y el primero.
+        for(size_t y = from ; y >= to ; y--) //Recorremos todos los años entre el último y el primero, de manera descendente.
         {
+            //Extraemos la cantidad de películas y series en ese año
             size_t movies = getAmount(db, "movie", y);
             size_t series = getAmount(db, "tvSeries", y);
+
             if( movies!=0 || series!=0 ) //Si hubo algún título ese año
             {
-                ///query1
+                //Escribimos el renglón de ese año en query1.csv
                 numToText(y, buffer[0]);
                 numToText(movies, buffer[1]);
                 numToText(series, buffer[2]);
                 writeLine(query1, 3, buffer);
 
+                //El año ya está en buffer[0]
 
-                ///query2
+                //Escribimos los renglones con cada género de ese año en query2.csv
                 toBeginGenre(db, y);
                 size_t count;
-                while(hasNext(db)){
+                while(hasNext(db)){ //Cuando no hayan más géneros ese año, hasNext devuelve 0
                     count = next(db, buffer[1]);
                     numToText(count, buffer[2]);
                     writeLine(query2, 3, buffer);
                 }
 
-
-                ///query3
+                //Escribimos el renglón de ese año en query3.csv
                 float rating;
                 size_t votes;
-                //El año ya está en buffer[0]
+
                 char * aux = getBest(db, "movie", y, &rating, &votes);
                 if(aux!=NULL) {
                     strcpy(buffer[1], aux);
@@ -105,7 +109,7 @@ int main(int argcount, char* args[])
                 else //Si no hubo películas ese año
                 {
                     for(int i=1; i<=3; i++){
-                        strcpy(buffer[i], "\\N");
+                        strcpy(buffer[i], "\\N"); //Completamos con \N
                     }
                 }
                 free(aux);
@@ -119,7 +123,7 @@ int main(int argcount, char* args[])
                 else //Si no hubo series ese año
                 {
                     for(int i=4; i<=6; i++){
-                        strcpy(buffer[i], "\\N");
+                        strcpy(buffer[i], "\\N"); //Completamos con \N
                     }
                 }
                 free(aux);

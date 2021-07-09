@@ -1,12 +1,14 @@
 #include "imdbADT.h"
 
 #define BLOCK 10
+//Macro para chequear que haya memoria suficiente cuando se realiza un malloc, calloc o realloc
 #define CHECK_ALLOC(x) {    if((x)==NULL || errno==ENOMEM)\
                             {  fprintf(stderr, "Error. No more memory available.\n");\
                                 exit(3);\
                             }\
                         }
-//Lista para generos (query2)
+
+//Nodo de lista para generos (query2)
 typedef struct node{
     char * genre;
     struct node * tail;
@@ -15,14 +17,14 @@ typedef struct node{
 
 typedef TNode * TList;
 
-//Para query3
+//Para query3 - Contiene información relevante de la mejor película o serie del año
 typedef struct best{
     char * name;
     float rating;
     size_t votes;
 }best;
 
-//Información del año
+//Información relevante del año
 typedef struct yearInfo{
     size_t amountSeries;
     size_t amountMovies;
@@ -33,16 +35,16 @@ typedef struct yearInfo{
 
 // Nuestro CDT
 typedef struct imdbCDT{
-    yearInfo ** yearsAfter;
-    size_t sizeAfter;
-    yearInfo ** yearsBefore;
-    size_t sizeBefore;
+    yearInfo ** yearsAfter;         //Son dos vectores dinámicos a partir del "año cero" (el año del primer título ingresado)
+    size_t sizeAfter;               //Uno hacia adelante en el tiempo, y uno hacia atras
+    yearInfo ** yearsBefore;        //Ejemplo: si el primer año leído es 1970 => el 1973 está en el elemento 3 de yearsAfter, el 1970 está en el elemento 0 de yearsAfter,
+    size_t sizeBefore;              //el 1969 está en el elemento 1 de yearsBefore. La posición 0 de yearsBefore la dejamos sin usar para simplificar las cuentas
     size_t yearZero;
-    //Se itera un año a la vez
+    //Se itera por los géneros un año a la vez
     TList currentGenre;
 }imdbCDT;
 
-static char * copyString(const char * string){//Funcion auxiliar para copiar strings en el heap en forma de bloques
+static char * copyString(const char * string){  //Funcion auxiliar para copiar strings en el heap en forma de bloques
     char * aux=NULL;
     int dim=0;
     while(*string != '\0'){
@@ -76,13 +78,13 @@ static void query1(yearInfo* year, char * titleType){//Se diferencia si es una p
         year->amountSeries++;
 }
 
-static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){
+static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){ //Recibe todos los géneros (ordenados) a los que se les debe incrementar su contador
     int c;
-    if(dim==0)//Si se llega a dim==0 entonces no hay mas géneros por los cuales se deba iterar en la lista
+    if(dim==0)  //Si se llega a dim==0 entonces no hay mas géneros por los cuales se deba iterar en la lista
     {
         return first;
     }
-    if(first==NULL || (c=strcmp(first->genre, genres[0])) >0){//Se crea el género y se agrega a la lista pero se sigue iterando
+    if(first==NULL || (c=strcmp(first->genre, genres[0])) > 0){  //Se crea el género y se agrega a la lista pero se sigue iterando
         TList new = malloc(sizeof(TNode));
         CHECK_ALLOC(new);
         new->genre = copyString(genres[0]);
@@ -90,11 +92,11 @@ static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){
         new->tail = addGenre(first, genres+1, dim-1);
         return new;
     }
-    else if(c == 0){//Se aumenta el contador del género respectivo y se sigue iterando
+    else if(c == 0){    //Se aumenta el contador del género respectivo y se sigue iterando
         first->count++;
         first->tail = addGenre(first->tail, genres+1, dim-1);
     }
-    else//No es el género indicado entonces sigue buscando
+    else    //No es el género indicado, entonces sigue buscando
         first->tail = addGenre(first->tail, genres, dim);
     return first;
 }
@@ -102,22 +104,22 @@ static TList addGenre(TList first, char* genres[MAX_GENRES], size_t dim){
 static void query2(yearInfo* year, char * genreText){
     char* genres[MAX_GENRES];   // Se crea un vector de géneros respectivos a la película con una Dim fija
     int c = 0;
-    genres[c] = strtok(genreText, SEPARATOR);//Se los separa en Tokens delimitados por una ","
+    genres[c] = strtok(genreText, SEPARATOR);   //Se los separa en Tokens delimitados por una ","
     if(genres[c]!=NULL)
         c++;
-    while(c<MAX_GENRES && (genres[c] = strtok(NULL, SEPARATOR)) != NULL)//Se cargan los Tokens mientras
-    {                                                                      //NO se pase el límite fijado
+    while(c<MAX_GENRES && (genres[c] = strtok(NULL, SEPARATOR)) != NULL)    //Se cargan los Tokens mientras
+    {                                                                          //NO se pase el límite fijado
         c++;
     }
 
-    qsort(genres, c, sizeof(char*), (int (*)(const void *, const void*)) strcmp);//Se ordenan los géneros alfabéticamente
+    qsort(genres, c, sizeof(char*), (int (*)(const void *, const void*)) strcmp);   //Se ordenan los géneros alfabéticamente
 
-    year->firstGenre = addGenre(year->firstGenre, genres, c);//Se envía el vector a la lista correspondiente para iterar
+    year->firstGenre = addGenre(year->firstGenre, genres, c);   //Se envía el vector con los géneros ordenados a la lista correspondiente
 }
 
 static void query3(yearInfo* year, char* titleType, char* primaryTitle, float rollsRoyce, size_t votes){
     best* bestInfo;
-    if(strcmp(titleType, "movie") == 0)//Se separa en el caso de ser una serie o una película
+    if(strcmp(titleType, "movie") == 0) //Se separa en el caso de ser una serie o una película
     {
         bestInfo = &year->bestMovie;
     }
@@ -125,12 +127,12 @@ static void query3(yearInfo* year, char* titleType, char* primaryTitle, float ro
     {
         bestInfo = &year->bestSeries;
     }
-    else//Si no es ni una película o ni una serie no hace nada
+    else    //Si no es ni una película o ni una serie no hace nada
     {
         return;
     }
-    if(bestInfo->name == NULL || votes > bestInfo->votes)//Si es la primera película/serie
-    {                                                    //O tiene una mayor cantidad de votos se agregan al año respectivo
+    if(bestInfo->name == NULL || votes > bestInfo->votes)   //Si es la primera película/serie actualmente en ese año
+    {                                                       //O tiene una mayor cantidad de votos se agregan al año respectivo
         free(bestInfo->name);
         bestInfo->name = copyString(primaryTitle);
         bestInfo->votes = votes;
@@ -138,7 +140,7 @@ static void query3(yearInfo* year, char* titleType, char* primaryTitle, float ro
     }
 }
 
-//Añade la película o serie al ADT, si no lo puedo agregar porque el "year" == 0, retorna 0, sino 1
+//Añade la película o serie al ADT, si no lo pudo agregar porque el "year" == 0, retorna 0, sino 1
 int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genre, float rating, size_t votes){
     if(year==0)
         return 0;
