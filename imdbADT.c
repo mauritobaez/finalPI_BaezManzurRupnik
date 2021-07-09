@@ -38,8 +38,8 @@ typedef struct imdbCDT{
     yearInfo ** yearsAfter;         //Son dos vectores dinámicos a partir del "año cero" (el año del primer título ingresado)
     size_t sizeAfter;               //Uno hacia adelante en el tiempo, y uno hacia atras
     yearInfo ** yearsBefore;        //Ejemplo: si el primer año leído es 1970 => el 1973 está en el elemento 3 de yearsAfter, el 1970 está en el elemento 0 de yearsAfter,
-    size_t sizeBefore;              //el 1969 está en el elemento 1 de yearsBefore. La posición 0 de yearsBefore la dejamos sin usar para simplificar las cuentas
-    size_t yearZero;
+    size_t sizeBefore;              //y el 1969 estará en el elemento 1 de yearsBefore. La posición 0 de yearsBefore la dejamos sin usar para simplificar las cuentas.
+    size_t yearZero;                //Si por ejemplo, el año 1958 no posee películas ni series, entonces yearsBefore[12]=NULL
     //Se itera por los géneros un año a la vez
     TList currentGenre;
 }imdbCDT;
@@ -71,8 +71,8 @@ imdbADT newImdb(){
 
 ///ADD
 
-static void query1(yearInfo* year, char * titleType){//Se diferencia si es una pelicula o una serie
-    if(strcmp(titleType, "movie") == 0)             //Y se aumenta el contador respectivo dentro del año
+static void query1(yearInfo* year, char * titleType){   //Se diferencia si es una pelicula o una serie
+    if(strcmp(titleType, "movie") == 0)                 //Y se aumenta el contador respectivo dentro del año
         year->amountMovies++;
     else if (strcmp(titleType, "tvSeries") == 0)
         year->amountSeries++;
@@ -150,47 +150,47 @@ int add(imdbADT db, char* titleType, char* primaryTitle, size_t year, char* genr
     yearInfo*** yearsVec;
     size_t yearIdx;
     size_t* currentSize;
-    if(year >= db->yearZero){//Si el año es mayor o igual al año cero se lo usan en años despues
+    if(year >= db->yearZero){       //Si el año es mayor o igual al año cero se usa yearsAfter
         yearsVec = &db->yearsAfter;
         yearIdx = year - db->yearZero;
         currentSize = &db->sizeAfter;
     }
-    else{//Viceversa con los años antes pero el año despues [0] se lo deja vacio por razones de comodidad
+    else{       //Si el año es menor al año cero se usa yearsBefore. yearsBefore[0] se lo deja vacio por razones de comodidad
         yearsVec = &db->yearsBefore;
         yearIdx = db->yearZero - year;
         currentSize = &db->sizeBefore;
     }
-    if( yearIdx >= *currentSize ){//Si no hay espacio suficiente para ese año se crean espacios hasta ese año respectivo
+    if( yearIdx >= *currentSize ){  //Si no hay espacio suficiente para ese año se crean espacios hasta ese año respectivo
         *yearsVec = realloc(*yearsVec, sizeof(yearInfo*) * (yearIdx + 1));
         CHECK_ALLOC(*yearsVec);
         memset(*yearsVec + *currentSize, 0, sizeof(yearInfo*) * (yearIdx + 1 - *currentSize));
         *currentSize = yearIdx + 1;
     }
-    if((*yearsVec)[yearIdx] == NULL)//Si el año no esta inicializado==NULL(Vacio) se crea el espacio correspondiente
+    if((*yearsVec)[yearIdx] == NULL)    //Si en ese año no hubieron títulos hasta ahora (==NULL), se reserva el espacio correspondiente
     {
         (*yearsVec)[yearIdx] = calloc(1, sizeof(yearInfo));
         CHECK_ALLOC((*yearsVec)[yearIdx]);
     }
-    query1((*yearsVec)[yearIdx] ,titleType);//Se aumenta el contador de la Query1
-    if(strcmp(titleType, "movie") == 0)//Solo si es una película se lo envía a la query2 ya que tiene géneros respectivos
+    query1((*yearsVec)[yearIdx] ,titleType);    //Se aumenta el contador de la Query1
+    if(strcmp(titleType, "movie") == 0)         //Solo si es una película se lo envía a la query2
         query2((*yearsVec)[yearIdx] ,genre);
-    query3((*yearsVec)[yearIdx] ,titleType,primaryTitle,rating,votes);//Se lo envía a la Query3
+    query3((*yearsVec)[yearIdx] ,titleType,primaryTitle,rating,votes);  //Se lo envía a la Query3
     return 1;
 }
 
 
-size_t getLastYear(imdbADT db){//Devuelve el último año que se guardó ej los años van de [1970-2021] devuelve 2021
+size_t getLastYear(imdbADT db){     //Devuelve el año mas reciente que se guardó. Ej.: si los años van de [1980-2021], devuelve 2021
     if(db->yearZero==0) return 0;
     return db->sizeAfter + db->yearZero - 1;
 }
 
-size_t getFirstYear(imdbADT db){//Viceversa con lo anterior si es de [1970-2021] devuelve 1970
+size_t getFirstYear(imdbADT db){    //Devuelve el año mas antiguo que se guardó. Ej.: si los años van de [1980-2021], devuelve 1980
     if(db->yearZero==0) return 0;
-    return db->yearZero - db->sizeBefore + 1;//Se tiene en cuenta que el añoDespues[0] esta vacio
+    return db->yearZero - db->sizeBefore + 1;   //Se tiene en cuenta que el yearsBefore[0] esta vacio
 }
 
 ///QUERY 1
-size_t getAmount(imdbADT db, char * titleType, size_t year){//Devuelve la cantidad de películas o series en una año respectivo
+size_t getAmount(imdbADT db, char * titleType, size_t year){    //Devuelve la cantidad de películas o series en una año respectivo
     size_t yearIdx;
     yearInfo** yearsVec;
     if(year >= db->yearZero){
@@ -201,9 +201,9 @@ size_t getAmount(imdbADT db, char * titleType, size_t year){//Devuelve la cantid
         yearsVec = db->yearsBefore;
         yearIdx = db->yearZero - year;
     }
-    if(yearsVec[yearIdx]==NULL)//Si el año esta vacio==NULL no hubo películas/series
+    if(yearsVec[yearIdx]==NULL) //Si el año está vacio(==NULL), no hubo películas/series
         return 0;
-    if(strcmp(titleType, "movie") == 0)//Dependiendo de si es una serie o película lo que se pide, devuelve uno o lo otro
+    if(strcmp(titleType, "movie") == 0)  //Dependiendo de si es una serie o película lo que se pide, devuelve uno o lo otro
     {
         return yearsVec[yearIdx]->amountMovies;
     }
@@ -211,11 +211,11 @@ size_t getAmount(imdbADT db, char * titleType, size_t year){//Devuelve la cantid
     {
         return yearsVec[yearIdx]->amountSeries;
     }
-    return 0;
+    return 0;   //Si en titleType se recibió algo distinto de "movie" o "tvSeries", devuelve 0
 }
 
 ///QUERY 2
-//iterador por genero
+//Se inicializa el iterador por genero
 void toBeginGenre(imdbADT imdb, size_t year){
     if(year>=imdb->yearZero) {
         imdb->currentGenre = imdb->yearsAfter[year - imdb->yearZero]->firstGenre;
@@ -224,13 +224,13 @@ void toBeginGenre(imdbADT imdb, size_t year){
         imdb->currentGenre = imdb->yearsBefore[-year+imdb->yearZero]->firstGenre;
 }
 
-int hasNext(imdbADT imdb){//Si no tiene genero siguiente en la lista entonces sera NULL
+int hasNext(imdbADT imdb){  //Si no hay más generos para leer en la lista, devuelve 0
     return imdb->currentGenre !=NULL;
 }
 
-// devuelve una copia del current
-size_t next(imdbADT imdb, char * string){//Devuelve el género respectivo del iterador en un string de salida
-    if(!hasNext(imdb)){                  //Y la cantidad de veces que aparece el mismo en su nombre
+//Devuelve la cantidad de películas y, por parámetro, el nombre del género
+size_t next(imdbADT imdb, char * string){
+    if(!hasNext(imdb)){
         return 0;
     }
     strcpy(string, imdb->currentGenre->genre);
@@ -240,8 +240,9 @@ size_t next(imdbADT imdb, char * string){//Devuelve el género respectivo del it
 }
 
 ///QUERY 3
-char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* votes){//Devuelve la mejor película
-    size_t yearIdx;                                                                   //O serie y sus respectivos datos
+//Devuelve el nombre de la mejor película o serie y, por parámetro, el rating y la cantidad de votos de la misma
+char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* votes){
+    size_t yearIdx;
     yearInfo** yearsVec;
     if(year >= db->yearZero){
         yearsVec = db->yearsAfter;
@@ -251,16 +252,16 @@ char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* v
         yearsVec = db->yearsBefore;
         yearIdx = db->yearZero - year;
     }
-    if(yearsVec[yearIdx]==NULL)//Si no hubo películas/series ese año se lo ignora y no se hace nada
+    if(yearsVec[yearIdx]==NULL) //Si no hubo películas ni series ese año se devuelve NULL
         return NULL;
     char * aux = NULL;
-    if(strcmp(titleType, "movie") == 0)//Si es una película o serie lo que se pide, devuelve uno o el otro
+    if(strcmp(titleType, "movie") == 0) //Si es una película o serie lo que se pide, devuelve uno o el otro
     {
         if(yearsVec[yearIdx]->bestMovie.name==NULL)
             return NULL;
-        *rating = yearsVec[yearIdx]->bestMovie.rating;//Los ratings y votos se devuelven por parametros para dar mas
-        *votes = yearsVec[yearIdx]->bestMovie.votes;  //libertad a la hora de implementar el Front-End
-        aux = copyString(yearsVec[yearIdx]->bestMovie.name);// Es necesario liberar este string luego de usarlo
+        *rating = yearsVec[yearIdx]->bestMovie.rating;          //Los ratings y votos se devuelven por parametros para dar mas
+        *votes = yearsVec[yearIdx]->bestMovie.votes;            //libertad a la hora de implementar el Front-End
+        aux = copyString(yearsVec[yearIdx]->bestMovie.name);    //Es necesario liberar este string luego de usarlo
     }
     else if (strcmp(titleType, "tvSeries") == 0)
     {
@@ -274,7 +275,7 @@ char* getBest(imdbADT db, char* titleType, size_t year, float* rating, size_t* v
 }
 
 ///FREE
-static void freeList(TList list){//Se libera la lista usada y los espacios de los géneros usados
+static void freeList(TList list){   //Se libera la lista usada y los espacios de los géneros usados
     if(list==NULL)
         return;
     freeList(list->tail);
@@ -282,7 +283,7 @@ static void freeList(TList list){//Se libera la lista usada y los espacios de lo
     free(list);
 }
 
-static void freeVector(yearInfo ** vector, size_t until){//Se liberan todos los recursos usados en cada año
+static void freeVector(yearInfo ** vector, size_t until){   //Se liberan todos los recursos usados en cada año
     for(int i=0; i<until; i++){
         if(vector[i] != NULL){
             freeList(vector[i]->firstGenre);
@@ -292,6 +293,7 @@ static void freeVector(yearInfo ** vector, size_t until){//Se liberan todos los 
         }
     }
 }
+
 //Libera el ADT
 void freeImdb(imdbADT imdb){
     freeVector(imdb->yearsAfter, imdb->sizeAfter);
